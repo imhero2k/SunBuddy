@@ -1,4 +1,4 @@
-import type { DashboardData } from "../../../src/components/Dashboard";
+import type { DashboardData } from "../types";
 import { fetchArpansaUv } from "../clients/arpansa";
 import { fetchOpenMeteoCloudCover } from "../clients/openMeteo";
 
