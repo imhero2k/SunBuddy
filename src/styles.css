@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-background text-slate-900 antialiased;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", sans-serif;
+}
+
+.ios-card {
+  @apply bg-card-bg rounded-3xl shadow-soft border border-white/60;
+  backdrop-filter: blur(24px);
+}
+
+.ios-pill {
+  @apply rounded-full px-3 py-1 text-xs font-medium bg-slate-900 text-white;
+}
+
+.tab-icon {
+  @apply flex flex-col items-center gap-1 text-xs;
+}
+
+.tab-icon-active {
+  @apply text-slate-900;
+}
+
+.tab-icon-inactive {
+  @apply text-slate-400;
+}
+
