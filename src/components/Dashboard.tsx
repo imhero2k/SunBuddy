@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import { MinimalUvCard } from "./widgets/MinimalUvCard";
 import { SimpleStatCard } from "./widgets/SimpleStatCard";
 import { ProCard } from "./widgets/ProCard";
-import { LocationCard } from "./widgets/LocationCard";
+import { LocationSelector } from "./widgets/LocationSelector";
 
 export type DashboardData = {
   minimalUv: number;
   time: string;
   peakUvTime: string;
+  peakUvLevel: number;
   cloudCover: number;
   burnRisk: string;
   sunscreenNeed: string;
+  sunscreenSpf: string;
   vitaminDStatus: string;
   uvExposureStatus: string;
 };
@@ -18,10 +20,12 @@ export type DashboardData = {
 const initialData: DashboardData = {
   minimalUv: 0,
   time: "--:--",
-  peakUvTime: "1:30 pm",
+  peakUvTime: "—",
+  peakUvLevel: 0,
   cloudCover: 0,
   burnRisk: "No Risk",
   sunscreenNeed: "No Need",
+  sunscreenSpf: "SPF 15+",
   vitaminDStatus: "No intake currently",
   uvExposureStatus: "No risk currently"
 };
@@ -31,6 +35,14 @@ export const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [uvForecast, setUvForecast] = useState<number[] | null>(null);
+  const [peakUvInfo, setPeakUvInfo] = useState<{ level: number; time: string } | null>(null);
+  const [selectedLat, setSelectedLat] = useState<number | undefined>(undefined);
+  const [selectedLon, setSelectedLon] = useState<number | undefined>(undefined);
+
+  const handleLocationChange = (lat: number, lon: number) => {
+    setSelectedLat(lat);
+    setSelectedLon(lon);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,23 +50,29 @@ export const Dashboard: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        let lat: number | undefined;
-        let lon: number | undefined;
+        let lat: number | undefined = selectedLat;
+        let lon: number | undefined = selectedLon;
 
-        if ("geolocation" in navigator) {
-          try {
-            const position = await new Promise<GeolocationPosition>(
-              (resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                  enableHighAccuracy: false,
-                  timeout: 8000
-                });
-              }
-            );
-            lat = position.coords.latitude;
-            lon = position.coords.longitude;
-          } catch (err) {
-            console.error("[Dashboard] geolocation failed, using server defaults:", err instanceof Error ? err.message : err);
+        // If no location selected, try geolocation as fallback
+        if (lat == null || lon == null) {
+          if ("geolocation" in navigator) {
+            try {
+              const position = await new Promise<GeolocationPosition>(
+                (resolve, reject) => {
+                  navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: false,
+                    timeout: 8000
+                  });
+                }
+              );
+              lat = position.coords.latitude;
+              lon = position.coords.longitude;
+              // Update selected location to match geolocation
+              setSelectedLat(lat);
+              setSelectedLon(lon);
+            } catch (err) {
+              console.error("[Dashboard] geolocation failed, using server defaults:", err instanceof Error ? err.message : err);
+            }
           }
         }
 
@@ -91,17 +109,46 @@ export const Dashboard: React.FC = () => {
 
         if (forecastRes && forecastRes.ok) {
           const forecastJson = (await forecastRes.json()) as {
-            points?: { uv: number }[];
+            points?: { uv: number; time?: string }[];
           };
-          const values = (forecastJson.points ?? [])
+          const points = forecastJson.points ?? [];
+          const values = points
             .map((p) => (typeof p.uv === "number" ? p.uv : 0))
             .slice(0, 24);
           setUvForecast(values.length > 1 ? values : null);
+
+          // Calculate peak UV level and time
+          if (points.length > 0) {
+            let maxUv = 0;
+            let maxIndex = 0;
+            points.slice(0, 24).forEach((p, idx) => {
+              const uv = typeof p.uv === "number" ? p.uv : 0;
+              if (uv > maxUv) {
+                maxUv = uv;
+                maxIndex = idx;
+              }
+            });
+
+            if (maxUv > 0 && points[maxIndex]?.time) {
+              const peakTime = new Date(points[maxIndex].time);
+              const formattedTime = peakTime.toLocaleTimeString(undefined, {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true
+              });
+              setPeakUvInfo({ level: maxUv, time: formattedTime });
+            } else {
+              setPeakUvInfo(null);
+            }
+          } else {
+            setPeakUvInfo(null);
+          }
         } else {
           if (forecastRes && !forecastRes.ok) {
             console.error("[Dashboard] uv-forecast fetch failed:", forecastRes.status, forecastRes.statusText);
           }
           setUvForecast(null);
+          setPeakUvInfo(null);
         }
       } catch (err) {
         console.error("[Dashboard] fetch error:", err instanceof Error ? err.message : err);
@@ -111,8 +158,19 @@ export const Dashboard: React.FC = () => {
       }
     };
 
+    // Initial fetch
     fetchData();
-  }, []);
+
+    // Auto-refresh every 2 minutes (120000ms)
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 120000);
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [selectedLat, selectedLon]);
 
   return (
     <div className="space-y-6">
@@ -126,21 +184,18 @@ export const Dashboard: React.FC = () => {
           </h1>
           <p className="text-xs text-slate-500 mt-1">
             {loading
-              ? "Loading from your location…"
+              ? "Loading forecast…"
               : error
               ? error
               : (
                   <>
                     Last updated at{" "}
                     <span className="font-medium">{data.time}</span>
+                    {" • "}
+                    <span className="text-slate-400">Auto-refreshes every 2 minutes</span>
                   </>
                 )}
           </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="ios-card px-3 py-2 text-xs flex items-center gap-1">
-            🔁 <span>Refresh</span>
-          </button>
         </div>
       </header>
 
@@ -158,23 +213,30 @@ export const Dashboard: React.FC = () => {
         />
         <SimpleStatCard
           title="Sunscreen"
-          value={data.sunscreenNeed}
+          value={data.sunscreenSpf || "SPF 15+"}
+          subtitle={data.sunscreenNeed}
           variant="sunscreen"
         />
         <ProCard
           title="UV Forecast"
-          subtitle="Next 24 hours. Orange intensity = UV strength."
-          accent="Peak UV typically midday."
+          subtitle={peakUvInfo 
+            ? `Peak: ${peakUvInfo.level.toFixed(1)} at ${peakUvInfo.time}`
+            : "Next 24 hours. Orange intensity = UV strength."}
+          accent={peakUvInfo ? "Next 24 hours forecast" : "Peak UV typically midday."}
           chartValues={uvForecast ?? undefined}
         />
         <ProCard
           title="UV Exposure"
           subtitle={data.uvExposureStatus}
-          accent="No risk of sunburn at the moment."
+          accent=""
         />
       </section>
 
-      <LocationCard />
+      <LocationSelector
+        onLocationChange={handleLocationChange}
+        currentLat={selectedLat}
+        currentLon={selectedLon}
+      />
     </div>
   );
 };

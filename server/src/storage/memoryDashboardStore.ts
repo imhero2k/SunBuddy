@@ -7,12 +7,13 @@ const DEFAULT_LON = 151.21;
 
 function classifyFromUv(uvi: number): Pick<
   DashboardData,
-  "burnRisk" | "sunscreenNeed" | "vitaminDStatus" | "uvExposureStatus"
+  "burnRisk" | "sunscreenNeed" | "sunscreenSpf" | "vitaminDStatus" | "uvExposureStatus"
 > {
   if (uvi < 3) {
     return {
       burnRisk: "No Risk",
       sunscreenNeed: "No Need",
+      sunscreenSpf: "SPF 15+",
       vitaminDStatus: "Low intake currently",
       uvExposureStatus: "No risk currently"
     };
@@ -22,6 +23,7 @@ function classifyFromUv(uvi: number): Pick<
     return {
       burnRisk: "Moderate",
       sunscreenNeed: "Recommended",
+      sunscreenSpf: "SPF 30+",
       vitaminDStatus: "Good exposure",
       uvExposureStatus: "Be cautious in direct sun"
     };
@@ -31,6 +33,7 @@ function classifyFromUv(uvi: number): Pick<
     return {
       burnRisk: "High",
       sunscreenNeed: "Strongly recommended",
+      sunscreenSpf: "SPF 50+",
       vitaminDStatus: "High exposure",
       uvExposureStatus: "Limit unprotected time"
     };
@@ -39,6 +42,7 @@ function classifyFromUv(uvi: number): Pick<
   return {
     burnRisk: "Very High",
     sunscreenNeed: "Essential",
+    sunscreenSpf: "SPF 50+",
     vitaminDStatus: "Very high exposure",
     uvExposureStatus: "Avoid midday sun"
   };
@@ -90,6 +94,7 @@ export async function getDashboardSnapshot(
       minimalUv: uvi,
       time,
       peakUvTime: "—",
+      peakUvLevel: 0,
       cloudCover,
       ...classification
     };
@@ -99,9 +104,11 @@ export async function getDashboardSnapshot(
       minimalUv: 0,
       time,
       peakUvTime: "—",
+      peakUvLevel: 0,
       cloudCover: 0,
       burnRisk: "No Risk",
       sunscreenNeed: "No Need",
+      sunscreenSpf: "SPF 15+",
       vitaminDStatus: "No intake currently",
       uvExposureStatus: "No risk currently"
     };

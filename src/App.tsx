@@ -19,14 +19,6 @@ const App: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-xs text-slate-500">
-            <button className="ios-card px-3 py-1 flex items-center justify-center text-xs">
-              <span>＋</span>
-            </button>
-            <button className="w-8 h-8 rounded-full ios-card flex items-center justify-center">
-              👤
-            </button>
-          </div>
         </div>
       </header>
 
