@@ -3,6 +3,7 @@ import { MinimalUvCard } from "./widgets/MinimalUvCard";
 import { SimpleStatCard } from "./widgets/SimpleStatCard";
 import { ProCard } from "./widgets/ProCard";
 import { LocationSelector } from "./widgets/LocationSelector";
+import { apiFetch } from "../api";
 
 export type DashboardData = {
   minimalUv: number;
@@ -95,8 +96,8 @@ export const Dashboard: React.FC = () => {
             : null;
 
         const [dashRes, forecastRes] = await Promise.all([
-          fetch(dashboardUrl),
-          uvForecastUrl ? fetch(uvForecastUrl) : Promise.resolve(null)
+          apiFetch(dashboardUrl),
+          uvForecastUrl ? apiFetch(uvForecastUrl) : Promise.resolve(null)
         ]);
 
         if (!dashRes.ok) {
@@ -130,8 +131,9 @@ export const Dashboard: React.FC = () => {
               }
             });
 
-            if (maxUv > 0 && points[maxIndex]?.time) {
-              const peakTime = new Date(points[maxIndex].time);
+            const peakTimeValue = points[maxIndex]?.time;
+            if (maxUv > 0 && typeof peakTimeValue === "string") {
+              const peakTime = new Date(peakTimeValue);
               const formattedTime = peakTime.toLocaleTimeString(undefined, {
                 hour: "numeric",
                 minute: "2-digit",

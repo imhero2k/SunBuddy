@@ -1,0 +1,259 @@
+import React from "react";
+import {
+  ACTIVITIES,
+  FITZPATRICK_TYPES,
+  HOURS_BANDS,
+  SENSITIVITY_ITEMS,
+  type ActivityId,
+  type FitzpatrickTypeId,
+  type HoursBand
+} from "./data";
+import { buildRecommendations, estimateRiskTier } from "./engine";
+import { useLocalStorageState } from "./useLocalStorageState";
+
+type Props = {
+  currentUv: number;
+  peakUvNext24h?: number | null;
+};
+
+type Prefs = {
+  skinType: FitzpatrickTypeId | null;
+  sensitivityItemIds: string[];
+  activities: Record<ActivityId, HoursBand | null>;
+};
+
+const DEFAULT_ACTIVITIES: Record<ActivityId, HoursBand | null> = {
+  construction: null,
+  gardening: null,
+  running: null,
+  cycling: null,
+  team_sport: null,
+  surfing: null,
+  outdoor_cafe: null
+};
+
+export const PersonalizationPanel: React.FC<Props> = ({
+  currentUv,
+  peakUvNext24h
+}) => {
+  const [prefs, setPrefs] = useLocalStorageState<Prefs>("sunbuddy:prefs", {
+    skinType: null,
+    sensitivityItemIds: [],
+    activities: DEFAULT_ACTIVITIES
+  });
+
+  const risk = estimateRiskTier({
+    skinType: prefs.skinType,
+    sensitivityItemIds: prefs.sensitivityItemIds,
+    activities: prefs.activities,
+    currentUv,
+    peakUvNext24h
+  });
+
+  const recs = buildRecommendations({
+    skinType: prefs.skinType,
+    sensitivityItemIds: prefs.sensitivityItemIds,
+    activities: prefs.activities,
+    currentUv,
+    peakUvNext24h
+  });
+
+  const toggleSensitivity = (id: string) => {
+    setPrefs((p) => {
+      const set = new Set(p.sensitivityItemIds);
+      if (set.has(id)) set.delete(id);
+      else set.add(id);
+      return { ...p, sensitivityItemIds: Array.from(set) };
+    });
+  };
+
+  const setActivityBand = (id: ActivityId, band: HoursBand | null) => {
+    setPrefs((p) => ({ ...p, activities: { ...p.activities, [id]: band } }));
+  };
+
+  return (
+    <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <article className="ios-card p-4 lg:col-span-2">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <div className="text-sm font-semibold text-slate-900">
+              Personalisation
+            </div>
+            <div className="text-xs text-slate-500">
+              Choose what fits you for more specific guidance.
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div className="text-xs font-medium text-slate-700 mb-2">
+              Fitzpatrick skin type
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {FITZPATRICK_TYPES.map((t) => {
+                const selected = prefs.skinType === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    className={[
+                      "text-left rounded-2xl border px-3 py-2",
+                      selected
+                        ? "border-slate-900 bg-slate-900 text-white"
+                        : "border-slate-200 bg-white text-slate-900"
+                    ].join(" ")}
+                    onClick={() =>
+                      setPrefs((p) => ({ ...p, skinType: t.id }))
+                    }
+                    type="button"
+                  >
+                    <div className="text-xs font-semibold">{t.name}</div>
+                    <div
+                      className={[
+                        "text-[11px] mt-1",
+                        selected ? "text-white/80" : "text-slate-500"
+                      ].join(" ")}
+                    >
+                      {t.typicalResponse}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-2">
+              Examples are general. If unsure, choose the closest match.
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs font-medium text-slate-700 mb-2">
+              Medication & skin products
+            </div>
+            <div className="space-y-2">
+              {SENSITIVITY_ITEMS.map((item) => {
+                const checked = prefs.sensitivityItemIds.includes(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={[
+                      "w-full text-left rounded-2xl border px-3 py-2",
+                      checked
+                        ? "border-orange-600 bg-orange-50"
+                        : "border-slate-200 bg-white"
+                    ].join(" ")}
+                    onClick={() => toggleSensitivity(item.id)}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-xs font-semibold text-slate-900">
+                        {item.label}
+                      </div>
+                      <div className="text-[10px] text-slate-500">
+                        {item.photosensitivity}
+                      </div>
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-1">
+                      {item.note}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <div className="text-xs font-medium text-slate-700 mb-2">
+              Outdoor activity / work
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {ACTIVITIES.map((a) => (
+                <div
+                  key={a.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs font-semibold text-slate-900">
+                      {a.label}
+                    </div>
+                    <div className="text-[10px] text-slate-500">{a.kind}</div>
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    <button
+                      type="button"
+                      className={[
+                        "px-2 py-1 rounded-full text-[10px] border",
+                        prefs.activities[a.id] == null
+                          ? "bg-slate-900 text-white border-slate-900"
+                          : "bg-white text-slate-600 border-slate-200"
+                      ].join(" ")}
+                      onClick={() => setActivityBand(a.id, null)}
+                    >
+                      None
+                    </button>
+                    {HOURS_BANDS.map((b) => (
+                      <button
+                        key={b.id}
+                        type="button"
+                        className={[
+                          "px-2 py-1 rounded-full text-[10px] border",
+                          prefs.activities[a.id] === b.id
+                            ? "bg-slate-900 text-white border-slate-900"
+                            : "bg-white text-slate-600 border-slate-200"
+                        ].join(" ")}
+                        onClick={() => setActivityBand(a.id, b.id)}
+                      >
+                        {b.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <aside className="ios-card p-4">
+        <div className="text-sm font-semibold text-slate-900">
+          Your estimated risk
+        </div>
+        <div className="text-xs text-slate-500 mt-1">{risk.summary}</div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-xs text-slate-500">Risk tier</div>
+          <div
+            className={[
+              "px-2 py-1 rounded-full text-xs font-semibold",
+              risk.tier === "Low"
+                ? "bg-emerald-50 text-emerald-700"
+                : risk.tier === "Medium"
+                ? "bg-yellow-50 text-yellow-700"
+                : risk.tier === "High"
+                ? "bg-orange-50 text-orange-700"
+                : "bg-red-50 text-red-700"
+            ].join(" ")}
+          >
+            {risk.tier}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="text-xs font-medium text-slate-700 mb-2">
+            Personalised recommendations
+          </div>
+          <ul className="space-y-2">
+            {recs.slice(0, 7).map((r, idx) => (
+              <li key={idx} className="text-[11px] text-slate-600">
+                {r}
+              </li>
+            ))}
+          </ul>
+          <div className="text-[10px] text-slate-400 mt-3">
+            This is general guidance, not medical advice.
+          </div>
+        </div>
+      </aside>
+    </section>
+  );
+};
+
