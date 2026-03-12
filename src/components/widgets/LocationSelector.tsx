@@ -1,28 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 
-type City = {
+type GeoResult = {
+  id: number;
   name: string;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
+  admin1?: string;
+  country?: string;
 };
-
-const AUSTRALIAN_CITIES: City[] = [
-  { name: "Sydney", lat: -33.87, lon: 151.21 },
-  { name: "Melbourne", lat: -37.81, lon: 144.96 },
-  { name: "Brisbane", lat: -27.47, lon: 153.03 },
-  { name: "Perth", lat: -31.95, lon: 115.86 },
-  { name: "Adelaide", lat: -34.93, lon: 138.6 },
-  { name: "Canberra", lat: -35.28, lon: 149.13 },
-  { name: "Darwin", lat: -12.46, lon: 130.84 },
-  { name: "Hobart", lat: -42.98, lon: 147.32 },
-  { name: "Gold Coast", lat: -28.0, lon: 153.43 },
-  { name: "Newcastle", lat: -32.93, lon: 151.78 },
-  { name: "Townsville", lat: -19.26, lon: 146.82 },
-  { name: "Alice Springs", lat: -23.7, lon: 133.88 },
-  { name: "Cairns", lat: -16.92, lon: 145.78 },
-  { name: "Wollongong", lat: -34.43, lon: 150.89 },
-  { name: "Geelong", lat: -38.15, lon: 144.36 }
-];
 
 type Props = {
   onLocationChange: (lat: number, lon: number) => void;
@@ -30,34 +15,54 @@ type Props = {
   currentLon?: number;
 };
 
-export const LocationSelector: React.FC<Props> = ({
-  onLocationChange,
-  currentLat,
-  currentLon
-}) => {
-  const [selectedCity, setSelectedCity] = useState<string>("");
+export const LocationSelector: React.FC<Props> = ({ onLocationChange }) => {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<GeoResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Find current city based on coordinates
-  useEffect(() => {
-    if (currentLat != null && currentLon != null) {
-      const city = AUSTRALIAN_CITIES.find(
-        (c) =>
-          Math.abs(c.lat - currentLat) < 0.1 && Math.abs(c.lon - currentLon) < 0.1
-      );
-      if (city) {
-        setSelectedCity(city.name);
-      }
-    }
-  }, [currentLat, currentLon]);
-
-  const handleCityChange = (cityName: string) => {
-    setSelectedCity(cityName);
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSelectedLabel(null);
     setError(null);
-    const city = AUSTRALIAN_CITIES.find((c) => c.name === cityName);
-    if (city) {
-      onLocationChange(city.lat, city.lon);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (value.trim().length < 2) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
     }
+
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(value.trim())}&count=8&language=en&format=json`;
+        const res = await fetch(url);
+        const json = (await res.json()) as { results?: GeoResult[] };
+        setResults(json.results ?? []);
+        setShowDropdown(true);
+      } catch {
+        setError("Could not search for locations");
+        setResults([]);
+        setShowDropdown(false);
+      } finally {
+        setSearching(false);
+      }
+    }, 350);
+  };
+
+  const handleSelect = (r: GeoResult) => {
+    const parts = [r.name, r.admin1, r.country].filter(Boolean);
+    const label = parts.join(", ");
+    setQuery(label);
+    setSelectedLabel(label);
+    setResults([]);
+    setShowDropdown(false);
+    onLocationChange(r.latitude, r.longitude);
   };
 
   const handleUseCurrentLocation = async () => {
@@ -65,45 +70,52 @@ export const LocationSelector: React.FC<Props> = ({
       setError("Geolocation is not supported by your browser");
       return;
     }
-
     try {
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: false,
-            timeout: 8000
-          });
-        }
-      );
-      const newLat = position.coords.latitude;
-      const newLon = position.coords.longitude;
-      
-      // Try to find nearest city
-      let nearestCity: City | null = null;
-      let minDistance = Infinity;
-      
-      AUSTRALIAN_CITIES.forEach((city) => {
-        const distance = Math.sqrt(
-          Math.pow(city.lat - newLat, 2) + Math.pow(city.lon - newLon, 2)
-        );
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestCity = city;
-        }
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: false,
+          timeout: 8000
+        });
       });
-
-      if (nearestCity && minDistance < 1.0) {
-        setSelectedCity(nearestCity.name);
-        onLocationChange(nearestCity.lat, nearestCity.lon);
-      } else {
-        // Use exact coordinates if no nearby city
-        onLocationChange(newLat, newLon);
-        setSelectedCity("");
-      }
+      const { latitude, longitude } = position.coords;
       setError(null);
-    } catch (err) {
-      setError("Could not get your location. Please select a city.");
+      onLocationChange(latitude, longitude);
+
+      // Reverse geocode to get a human-readable label
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
+        const res = await fetch(url, {
+          headers: { "Accept-Language": "en" }
+        });
+        const json = (await res.json()) as {
+          address?: {
+            suburb?: string;
+            neighbourhood?: string;
+            town?: string;
+            city?: string;
+            state?: string;
+            country?: string;
+          };
+        };
+        const addr = json.address ?? {};
+        const suburb = addr.suburb ?? addr.neighbourhood ?? addr.town ?? addr.city ?? "";
+        const state = addr.state ?? "";
+        const label = [suburb, state].filter(Boolean).join(", ") || "Current Location";
+        setSelectedLabel(label);
+        setQuery("");
+      } catch {
+        // Reverse geocoding failed — fall back to generic label
+        setSelectedLabel("Current Location");
+        setQuery("");
+      }
+    } catch {
+      setError("Could not get your location. Please search for a suburb.");
     }
+  };
+
+  const handleBlur = () => {
+    // Delay hiding so clicks on results register first
+    setTimeout(() => setShowDropdown(false), 150);
   };
 
   return (
@@ -113,24 +125,48 @@ export const LocationSelector: React.FC<Props> = ({
         <span className="text-base">📍</span>
       </div>
       <div className="space-y-3">
-        <div>
-          <label className="text-[10px] text-slate-600 block mb-1.5">Select City</label>
-          <select
-            value={selectedCity}
-            onChange={(e) => handleCityChange(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800"
-          >
-            <option value="">Choose a city...</option>
-            {AUSTRALIAN_CITIES.map((city) => (
-              <option key={city.name} value={city.name}>
-                {city.name}
-              </option>
-            ))}
-          </select>
+        <div className="relative">
+          <label className="text-[10px] text-slate-600 block mb-1.5">Search suburb</label>
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            onBlur={handleBlur}
+            placeholder="e.g. Bondi, Fitzroy, Fortitude Valley…"
+            className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 placeholder-slate-400"
+          />
+          {searching && (
+            <span className="absolute right-3 top-[2.1rem] text-[10px] text-slate-400">
+              Searching…
+            </span>
+          )}
+          {showDropdown && results.length > 0 && (
+            <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
+              {results.map((r) => {
+                const label = [r.name, r.admin1, r.country].filter(Boolean).join(", ");
+                return (
+                  <li key={r.id}>
+                    <button
+                      type="button"
+                      onMouseDown={() => handleSelect(r)}
+                      className="w-full text-left px-3 py-2 text-sm text-slate-800 hover:bg-indigo-50 transition-colors"
+                    >
+                      {label}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {showDropdown && !searching && results.length === 0 && query.trim().length >= 2 && (
+            <div className="absolute z-10 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow px-3 py-2 text-sm text-slate-400">
+              No results found
+            </div>
+          )}
         </div>
-        {error && (
-          <p className="text-[10px] text-red-600">{error}</p>
-        )}
+
+        {error && <p className="text-[10px] text-red-600">{error}</p>}
+
         <button
           type="button"
           onClick={handleUseCurrentLocation}
@@ -138,9 +174,10 @@ export const LocationSelector: React.FC<Props> = ({
         >
           📍 Use Current Location
         </button>
-        {selectedCity && (
-          <p className="text-[10px] text-slate-500 mt-2 text-center">
-            Viewing forecast for {selectedCity}
+
+        {selectedLabel && (
+          <p className="text-[10px] text-slate-500 text-center">
+            Viewing forecast for <span className="font-medium">{selectedLabel}</span>
           </p>
         )}
       </div>

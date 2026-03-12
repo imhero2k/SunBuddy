@@ -9,4 +9,6 @@ export type DashboardData = {
   sunscreenSpf: string;
   vitaminDStatus: string;
   uvExposureStatus: string;
+  /** ARPANSA station used for current UV reading */
+  arpansaStation?: string;
 };

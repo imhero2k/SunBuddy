@@ -96,6 +96,7 @@ export async function getDashboardSnapshot(
       peakUvTime: "—",
       peakUvLevel: 0,
       cloudCover,
+      arpansaStation: uvResult.station,
       ...classification
     };
   } catch (err) {
