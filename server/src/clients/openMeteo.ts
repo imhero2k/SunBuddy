@@ -1,9 +1,42 @@
 /**
  * Open-Meteo - free, no API key, global coverage.
- * Used for cloud cover (ARPANSA doesn't provide it).
  */
 
 const OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast";
+
+export type CurrentWeather = {
+  uv: number;
+  cloudCover: number;
+};
+
+/** Fetches current UV index and cloud cover in a single request. */
+export async function fetchOpenMeteoCurrentWeather(
+  lat: number,
+  lon: number
+): Promise<CurrentWeather> {
+  const url = new URL(OPEN_METEO_URL);
+  url.searchParams.set("latitude", String(lat));
+  url.searchParams.set("longitude", String(lon));
+  url.searchParams.set("current", "uv_index,cloud_cover");
+  url.searchParams.set("timezone", "auto");
+
+  const res = await fetch(url.toString(), {
+    headers: { "User-Agent": "SunBuddy/1.0 (weather app)" }
+  });
+  if (!res.ok) {
+    throw new Error(`Open-Meteo current ${res.status}: ${res.statusText}`);
+  }
+  const body = (await res.json()) as {
+    current?: { uv_index?: number; cloud_cover?: number };
+  };
+  const uv = body.current?.uv_index;
+  const cloud = body.current?.cloud_cover;
+  console.log("[openmeteo] current uv:", uv, "cloud_cover:", cloud);
+  return {
+    uv: typeof uv === "number" && Number.isFinite(uv) ? uv : 0,
+    cloudCover: typeof cloud === "number" ? Math.round(cloud) : 0
+  };
+}
 
 export async function fetchOpenMeteoCloudCover(lat: number, lon: number): Promise<number> {
   const url = new URL(OPEN_METEO_URL);

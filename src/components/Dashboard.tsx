@@ -16,7 +16,6 @@ export type DashboardData = {
   sunscreenSpf: string;
   vitaminDStatus: string;
   uvExposureStatus: string;
-  arpansaStation?: string;
 };
 
 const initialData: DashboardData = {
@@ -203,7 +202,7 @@ export const Dashboard: React.FC = () => {
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <MinimalUvCard value={data.minimalUv} station={data.arpansaStation} />
+        <MinimalUvCard value={data.minimalUv} />
         <SimpleStatCard
           title="Cloud Cover"
           value={`${data.cloudCover ?? 0} %`}
