@@ -5,6 +5,7 @@ import {
   FITZPATRICK_TYPES,
   HOURS_BANDS,
   SENSITIVITY_ITEMS,
+  SKIN_CONDITION_ITEMS,
   type ActivityId,
   type ClothingCoverageId,
   type FitzpatrickTypeId,
@@ -21,6 +22,7 @@ type Props = {
 type Prefs = {
   skinType: FitzpatrickTypeId | null;
   sensitivityItemIds: string[];
+  skinConditionIds: string[];
   activities: Record<ActivityId, HoursBand | null>;
   clothingCoverage?: ClothingCoverageId | null;
 };
@@ -55,6 +57,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
   const [prefs, setPrefs] = useLocalStorageState<Prefs>("sunbuddy:prefs", {
     skinType: null,
     sensitivityItemIds: [],
+    skinConditionIds: [],
     activities: DEFAULT_ACTIVITIES,
     clothingCoverage: "tshirt_shorts"
   });
@@ -65,6 +68,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
   const risk = estimateRiskTier({
     skinType: prefs.skinType,
     sensitivityItemIds: prefs.sensitivityItemIds,
+    skinConditionIds: prefs.skinConditionIds,
     activities: prefs.activities,
     clothingCoverage,
     currentUv,
@@ -74,6 +78,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
   const recs = buildRecommendations({
     skinType: prefs.skinType,
     sensitivityItemIds: prefs.sensitivityItemIds,
+    skinConditionIds: prefs.skinConditionIds,
     activities: prefs.activities,
     clothingCoverage,
     currentUv,
@@ -83,6 +88,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
   const sunscreen = estimateSunscreenAmount({
     skinType: prefs.skinType,
     sensitivityItemIds: prefs.sensitivityItemIds,
+    skinConditionIds: prefs.skinConditionIds,
     activities: prefs.activities,
     clothingCoverage,
     currentUv,
@@ -95,6 +101,15 @@ export const PersonalizationPanel: React.FC<Props> = ({
       if (set.has(id)) set.delete(id);
       else set.add(id);
       return { ...p, sensitivityItemIds: Array.from(set) };
+    });
+  };
+
+  const toggleSkinCondition = (id: string) => {
+    setPrefs((p) => {
+      const set = new Set(p.skinConditionIds ?? []);
+      if (set.has(id)) set.delete(id);
+      else set.add(id);
+      return { ...p, skinConditionIds: Array.from(set) };
     });
   };
 
@@ -216,6 +231,40 @@ export const PersonalizationPanel: React.FC<Props> = ({
                         ))}
                       </ul>
                     )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <div className="text-xs font-medium text-slate-700 mb-2">
+              Common skin conditions
+            </div>
+            <p className="text-[11px] text-slate-500 mb-2">
+              Optional—select any that apply. Tips are general, not medical advice.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {SKIN_CONDITION_ITEMS.map((item) => {
+                const checked = (prefs.skinConditionIds ?? []).includes(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={[
+                      "w-full text-left rounded-2xl border px-3 py-2",
+                      checked
+                        ? "border-teal-600 bg-teal-50"
+                        : "border-slate-200 bg-white"
+                    ].join(" ")}
+                    onClick={() => toggleSkinCondition(item.id)}
+                  >
+                    <div className="text-xs font-semibold text-slate-900">
+                      {item.label}
+                    </div>
+                    <div className="text-[11px] text-slate-500 mt-1">
+                      {item.note}
+                    </div>
                   </button>
                 );
               })}
@@ -376,7 +425,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
             Personalised recommendations
           </div>
           <ul className="space-y-2">
-            {recs.slice(0, 16).map((r, idx) => (
+            {recs.slice(0, 22).map((r, idx) => (
               <li key={idx} className="text-[11px] text-slate-600">
                 {r}
               </li>

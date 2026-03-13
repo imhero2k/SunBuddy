@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Dashboard } from "./components/Dashboard";
 import { PersonalisationPage } from "./components/PersonalisationPage";
+import { GeneralInfoPage } from "./components/GeneralInfoPage";
 import { auth } from "./firebase";
 import { apiFetch } from "./api";
 import {
@@ -12,7 +13,9 @@ import {
 } from "firebase/auth";
 
 const App: React.FC = () => {
-  const [tab, setTab] = useState<"dashboard" | "personalisation">("dashboard");
+  const [tab, setTab] = useState<"dashboard" | "personalisation" | "general">(
+    "dashboard"
+  );
   const [currentUv, setCurrentUv] = useState<number>(0);
   const [peakUv, setPeakUv] = useState<number | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -97,6 +100,18 @@ const App: React.FC = () => {
                 >
                   Personalisation
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("general")}
+                  className={[
+                    "px-3 py-1 rounded-full text-xs border",
+                    tab === "general"
+                      ? "bg-slate-900 text-white border-slate-900"
+                      : "bg-white text-slate-600 border-slate-200"
+                  ].join(" ")}
+                >
+                  General info
+                </button>
               </div>
               <button
                 type="button"
@@ -117,11 +132,13 @@ const App: React.FC = () => {
           ) : user ? (
             tab === "dashboard" ? (
               <Dashboard />
-            ) : (
+            ) : tab === "personalisation" ? (
               <PersonalisationPage
                 currentUv={currentUv}
                 peakUvNext24h={peakUv}
               />
+            ) : (
+              <GeneralInfoPage />
             )
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 py-16">

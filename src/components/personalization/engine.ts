@@ -1,11 +1,18 @@
 import type { ActivityId, ClothingCoverageId, FitzpatrickTypeId, HoursBand } from "./data";
-import { ACTIVITIES, CLOTHING_COVERAGE_OPTIONS, HOURS_BANDS, SENSITIVITY_ITEMS } from "./data";
+import {
+  ACTIVITIES,
+  CLOTHING_COVERAGE_OPTIONS,
+  HOURS_BANDS,
+  SENSITIVITY_ITEMS,
+  SKIN_CONDITION_ITEMS
+} from "./data";
 
 export type RiskTier = "Low" | "Medium" | "High" | "Very High";
 
 export type PersonalizationInputs = {
   skinType: FitzpatrickTypeId | null;
   sensitivityItemIds: string[];
+  skinConditionIds?: string[];
   activities: Record<ActivityId, HoursBand | null>;
   clothingCoverage?: ClothingCoverageId | null;
   currentUv: number;
@@ -51,6 +58,49 @@ function sensitivityFactor(ids: string[]) {
   return 1 + clamp(score * 0.12, 0, 0.6);
 }
 
+function skinConditionFactor(ids: string[] | undefined) {
+  const set = new Set(ids ?? []);
+  if (set.size === 0) return 1;
+  // Slightly raise risk tier when conditions make sun damage or irritation more likely
+  const bumpPer = 0.06;
+  return 1 + clamp(set.size * bumpPer, 0, 0.35);
+}
+
+const SKIN_CONDITION_RECS: Record<string, string[]> = {
+  eczema: [
+    "Eczema: moisturise before sunscreen; try fragrance-free/mineral (zinc/titanium) SPF and patch-test on a small area first.",
+    "If stinging persists, ask a clinician or pharmacist for a product suited to eczema-prone skin."
+  ],
+  psoriasis: [
+    "Psoriasis: avoid sunburn—burns can trigger flares; use SPF on plaques if you’re out a long time.",
+    "If you use phototherapy or outdoor sun for plaques, follow your clinician’s plan—don’t stack long unprotected exposure."
+  ],
+  rosacea: [
+    "Rosacea: use SPF every day; wide-brim hat and shade reduce heat as well as UV.",
+    "Cool breaks out of direct sun help; reapply SPF if you sweat or wipe your face."
+  ],
+  acne: [
+    "Acne-prone: choose non-comedogenic, oil-free SPF—skipping sunscreen can worsen dark marks after breakouts.",
+    "Gel or fluid textures often feel lighter; reapply over any exposed skin when outdoors for hours."
+  ],
+  melasma: [
+    "Melasma: use high SPF (e.g. 50+), broad-brim hat, and reapply—visible light and UV both matter for many people.",
+    "Physical filters (zinc/titanium) are often preferred; be strict even on cloudy days."
+  ],
+  vitiligo: [
+    "Vitiligo: apply generous SPF to depigmented patches; clothing or SPF sticks help on small areas.",
+    "Burns on white patches are common—avoid peak UV when possible."
+  ],
+  skin_cancer_history: [
+    "After skin cancer or with many moles: prioritise shade, clothing, and SPF; avoid tanning beds entirely.",
+    "Keep routine skin checks with your clinician and note any new or changing spots."
+  ],
+  contact_dermatitis: [
+    "Sensitive skin: fragrance-free, minimal-ingredient sunscreens reduce reaction risk; patch test new products.",
+    "If a product stings or itches, stop using it and try another formulation (e.g. mineral-based)."
+  ]
+};
+
 export function estimateRiskTier(inputs: PersonalizationInputs): {
   tier: RiskTier;
   score: number;
@@ -67,7 +117,12 @@ export function estimateRiskTier(inputs: PersonalizationInputs): {
   }
   const activityFactor = 1 + clamp(activityScore / 50, 0, 1.2);
 
-  const score = uvFactor * activityFactor * skinFactor(inputs.skinType) * sensitivityFactor(inputs.sensitivityItemIds);
+  const score =
+    uvFactor *
+    activityFactor *
+    skinFactor(inputs.skinType) *
+    sensitivityFactor(inputs.sensitivityItemIds) *
+    skinConditionFactor(inputs.skinConditionIds);
 
   const tier: RiskTier =
     score < 1.1 ? "Low" : score < 1.6 ? "Medium" : score < 2.3 ? "High" : "Very High";
@@ -75,6 +130,8 @@ export function estimateRiskTier(inputs: PersonalizationInputs): {
   const summaryParts: string[] = [];
   if (inputs.skinType) summaryParts.push(`Skin type ${inputs.skinType}`);
   if (inputs.sensitivityItemIds.length > 0) summaryParts.push(`${inputs.sensitivityItemIds.length} sensitivity item(s)`);
+  const condCount = inputs.skinConditionIds?.length ?? 0;
+  if (condCount > 0) summaryParts.push(`${condCount} skin condition(s)`);
   const activityCount = Object.values(inputs.activities).filter(Boolean).length;
   if (activityCount > 0) summaryParts.push(`${activityCount} activity(ies)`);
 
@@ -187,6 +244,21 @@ export function buildRecommendations(inputs: PersonalizationInputs): string[] {
   if (sensitive) {
     recs.push("Some selected medications/products may increase photosensitivity—reduce unprotected exposure time.");
     recs.push("Be stricter with reapplication and consider SPF 50+ if you’ll be outdoors.");
+  }
+
+  // Skin conditions (tailored tips)
+  const conditionIds = inputs.skinConditionIds ?? [];
+  const seen = new Set<string>();
+  for (const id of conditionIds) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const tips = SKIN_CONDITION_RECS[id];
+    if (tips) for (const line of tips) recs.push(line);
+  }
+  if (conditionIds.length > 0) {
+    recs.push(
+      "Skin conditions vary widely—these tips are general; your clinician’s advice comes first."
+    );
   }
 
   // Activity-based advice
