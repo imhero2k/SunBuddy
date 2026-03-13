@@ -1,14 +1,16 @@
 import React from "react";
 import {
   ACTIVITIES,
+  CLOTHING_COVERAGE_OPTIONS,
   FITZPATRICK_TYPES,
   HOURS_BANDS,
   SENSITIVITY_ITEMS,
   type ActivityId,
+  type ClothingCoverageId,
   type FitzpatrickTypeId,
   type HoursBand
 } from "./data";
-import { buildRecommendations, estimateRiskTier } from "./engine";
+import { buildRecommendations, estimateRiskTier, estimateSunscreenAmount } from "./engine";
 import { useLocalStorageState } from "./useLocalStorageState";
 
 type Props = {
@@ -20,6 +22,7 @@ type Prefs = {
   skinType: FitzpatrickTypeId | null;
   sensitivityItemIds: string[];
   activities: Record<ActivityId, HoursBand | null>;
+  clothingCoverage?: ClothingCoverageId | null;
 };
 
 const DEFAULT_ACTIVITIES: Record<ActivityId, HoursBand | null> = {
@@ -39,13 +42,18 @@ export const PersonalizationPanel: React.FC<Props> = ({
   const [prefs, setPrefs] = useLocalStorageState<Prefs>("sunbuddy:prefs", {
     skinType: null,
     sensitivityItemIds: [],
-    activities: DEFAULT_ACTIVITIES
+    activities: DEFAULT_ACTIVITIES,
+    clothingCoverage: "tshirt_shorts"
   });
+
+  const clothingCoverage: ClothingCoverageId =
+    prefs.clothingCoverage ?? "tshirt_shorts";
 
   const risk = estimateRiskTier({
     skinType: prefs.skinType,
     sensitivityItemIds: prefs.sensitivityItemIds,
     activities: prefs.activities,
+    clothingCoverage,
     currentUv,
     peakUvNext24h
   });
@@ -54,6 +62,16 @@ export const PersonalizationPanel: React.FC<Props> = ({
     skinType: prefs.skinType,
     sensitivityItemIds: prefs.sensitivityItemIds,
     activities: prefs.activities,
+    clothingCoverage,
+    currentUv,
+    peakUvNext24h
+  });
+
+  const sunscreen = estimateSunscreenAmount({
+    skinType: prefs.skinType,
+    sensitivityItemIds: prefs.sensitivityItemIds,
+    activities: prefs.activities,
+    clothingCoverage,
     currentUv,
     peakUvNext24h
   });
@@ -69,6 +87,10 @@ export const PersonalizationPanel: React.FC<Props> = ({
 
   const setActivityBand = (id: ActivityId, band: HoursBand | null) => {
     setPrefs((p) => ({ ...p, activities: { ...p.activities, [id]: band } }));
+  };
+
+  const setClothingCoverage = (id: ClothingCoverageId) => {
+    setPrefs((p) => ({ ...p, clothingCoverage: id }));
   };
 
   return (
@@ -163,6 +185,58 @@ export const PersonalizationPanel: React.FC<Props> = ({
 
           <div className="md:col-span-2">
             <div className="text-xs font-medium text-slate-700 mb-2">
+              Clothing you’re wearing
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {CLOTHING_COVERAGE_OPTIONS.map((o) => {
+                const selected = clothingCoverage === o.id;
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    className={[
+                      "w-full text-left rounded-2xl border px-3 py-2",
+                      selected
+                        ? "border-slate-900 bg-slate-900 text-white"
+                        : "border-slate-200 bg-white text-slate-900"
+                    ].join(" ")}
+                    onClick={() => setClothingCoverage(o.id)}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base leading-none" aria-hidden="true">
+                          {o.icon}
+                        </span>
+                        <div className="text-xs font-semibold">{o.label}</div>
+                      </div>
+                      <div
+                        className={[
+                          "text-[10px]",
+                          selected ? "text-white/80" : "text-slate-500"
+                        ].join(" ")}
+                      >
+                        {Math.round(o.exposedFraction * 100)}% exposed
+                      </div>
+                    </div>
+                    <div
+                      className={[
+                        "text-[11px] mt-1",
+                        selected ? "text-white/80" : "text-slate-500"
+                      ].join(" ")}
+                    >
+                      {o.detail}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-2">
+              This estimate assumes sunscreen on exposed skin only.
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <div className="text-xs font-medium text-slate-700 mb-2">
               Outdoor activity / work
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -234,6 +308,25 @@ export const PersonalizationPanel: React.FC<Props> = ({
             ].join(" ")}
           >
             {risk.tier}
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3">
+          <div className="text-xs font-semibold text-slate-900">
+            Recommended sunscreen amount
+          </div>
+          <div className="mt-1 flex items-baseline justify-between gap-3">
+            <div className="text-[11px] text-slate-500">Per application</div>
+            <div className="text-sm font-semibold text-slate-900">
+              {sunscreen.mlPerApplication} mL
+              <span className="text-[11px] text-slate-500 font-normal">
+                {" "}
+                ({sunscreen.tspPerApplication} tsp)
+              </span>
+            </div>
+          </div>
+          <div className="text-[11px] text-slate-500 mt-2">
+            {sunscreen.label}
           </div>
         </div>
 

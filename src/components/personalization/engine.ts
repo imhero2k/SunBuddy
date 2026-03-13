@@ -1,5 +1,5 @@
-import type { ActivityId, FitzpatrickTypeId, HoursBand } from "./data";
-import { ACTIVITIES, HOURS_BANDS, SENSITIVITY_ITEMS } from "./data";
+import type { ActivityId, ClothingCoverageId, FitzpatrickTypeId, HoursBand } from "./data";
+import { ACTIVITIES, CLOTHING_COVERAGE_OPTIONS, HOURS_BANDS, SENSITIVITY_ITEMS } from "./data";
 
 export type RiskTier = "Low" | "Medium" | "High" | "Very High";
 
@@ -7,6 +7,7 @@ export type PersonalizationInputs = {
   skinType: FitzpatrickTypeId | null;
   sensitivityItemIds: string[];
   activities: Record<ActivityId, HoursBand | null>;
+  clothingCoverage?: ClothingCoverageId | null;
   currentUv: number;
   peakUvNext24h?: number | null;
 };
@@ -127,5 +128,45 @@ export function buildRecommendations(inputs: PersonalizationInputs): string[] {
   }
 
   return recs;
+}
+
+function clamp01(n: number) {
+  return clamp(n, 0, 1);
+}
+
+function getExposedFraction(clothingCoverage?: ClothingCoverageId | null) {
+  const id = clothingCoverage ?? "tshirt_shorts";
+  return (
+    CLOTHING_COVERAGE_OPTIONS.find((o) => o.id === id)?.exposedFraction ??
+    0.55
+  );
+}
+
+export function estimateSunscreenAmount(inputs: PersonalizationInputs): {
+  mlPerApplication: number;
+  tspPerApplication: number;
+  label: string;
+} {
+  // Rule-of-thumb: ~35 mL (7 tsp) for an average adult full body application.
+  // Scale by how much skin is exposed by clothing.
+  const exposed = clamp01(getExposedFraction(inputs.clothingCoverage));
+  const fullBodyMl = 35;
+  const ml = fullBodyMl * exposed;
+  const tsp = ml / 5; // 1 tsp ~= 5 mL
+
+  const roundedMl = Math.max(5, Math.round(ml / 2) * 2); // round to nearest 2 mL, minimum 5 mL
+  const roundedTsp = Math.max(1, Math.round((tsp + Number.EPSILON) * 10) / 10);
+
+  const uv = Math.max(inputs.currentUv, inputs.peakUvNext24h ?? 0);
+  const when =
+    uv >= 3
+      ? "Apply to exposed skin and reapply every 2 hours outdoors."
+      : "Apply to exposed skin for prolonged outdoor time.";
+
+  return {
+    mlPerApplication: roundedMl,
+    tspPerApplication: roundedTsp,
+    label: when
+  };
 }
 
