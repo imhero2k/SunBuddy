@@ -94,10 +94,81 @@ export function buildRecommendations(inputs: PersonalizationInputs): string[] {
   // Core protection
   if (uv >= 3) {
     recs.push("Use broad-spectrum SPF and reapply every 2 hours outdoors.");
-    recs.push("Wear a hat, UV-rated sunglasses, and cover up when possible.");
     recs.push("Prefer shade during peak UV hours (late morning to mid-afternoon).");
   } else {
     recs.push("UV is low right now, but protection is still wise for long outdoor time.");
+  }
+
+  // Clothing & accessories (hat, sunglasses, cover-up) — tailored to coverage + UV
+  const cover = inputs.clothingCoverage ?? "tshirt_shorts";
+  recs.push(
+    "Wear a wide-brim hat (or cap with neck flap) to shade face, ears, and neck."
+  );
+  recs.push(
+    "Use sunglasses labelled UV400 or category 3—wrap styles give extra side protection."
+  );
+  if (uv >= 5) {
+    recs.push("At moderate–high UV, add a lightweight long-sleeve layer you can put on and off.");
+  }
+  if (cover === "swimwear") {
+    recs.push(
+      "With swimwear: add a rash shirt or cover-up for shoulders/back, and lip balm with SPF."
+    );
+    if (uv >= 6) {
+      recs.push("Beach/pool days: reapply sunscreen after swimming; consider UV swim shirts and a sun umbrella.");
+    }
+  } else if (cover === "tshirt_shorts" || cover === "long_sleeves_shorts") {
+    recs.push(
+      "Legs still exposed—longer shorts, pants, or a sarong help when UV is strong."
+    );
+  } else if (cover === "tshirt_long_pants") {
+    recs.push(
+      "Arms are still exposed—swap to long sleeves or keep a UV shirt handy for peak hours."
+    );
+  } else if (cover === "long_sleeves_long_pants") {
+    recs.push(
+      "You’re well covered on body—focus on face, hands, and scalp: hat, shades, and SPF on backs of hands."
+    );
+  }
+  recs.push("Closed shoes or socks reduce burn on feet during long walks or sport.");
+
+  // Reapplication: only when the chosen activity / clothing matches
+  const act = inputs.activities;
+  const hasSwimContext =
+    act.surfing != null || cover === "swimwear";
+  const hasSweatySport =
+    act.running != null || act.cycling != null || act.team_sport != null;
+  const hasOutdoorWork = act.construction != null || act.gardening != null;
+
+  if (hasSwimContext) {
+    recs.push(
+      "Swimming or heavy splashing: get out, dry skin, and reapply—even water-resistant products wear off; follow the label (e.g. 40/80 min water resistance)."
+    );
+    recs.push(
+      "After swimming, towelling dry rubs sunscreen off—reapply once your skin is dry, even before 2 hours."
+    );
+    recs.push(
+      "Pool/beach: reapply after long swim sessions; a UV rash shirt means less skin relying on lotion in the water."
+    );
+  }
+  if (hasSweatySport) {
+    recs.push(
+      "Running / cycling / team sport: heavy sweating means reapplying more often than every 2 hours—pat dry, then reapply evenly."
+    );
+    recs.push(
+      "Wiping or towelling sweat during sport removes sunscreen—reapply during water or half-time breaks."
+    );
+    recs.push(
+      "Carry a travel-size sunscreen for mid-activity reapplication."
+    );
+  }
+  if (hasOutdoorWork) {
+    recs.push(
+      "Construction / outdoor chores: heat and sweat wash sunscreen away faster—reapply on breaks, more often than every 2 hours when working hard."
+    );
+    recs.push(
+      "Keep sunscreen accessible on site (travel size or pump)—towelling your face/neck removes protection, so reapply after wiping down."
+    );
   }
 
   // Skin-type specificity

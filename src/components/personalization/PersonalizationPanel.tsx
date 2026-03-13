@@ -376,7 +376,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
             Personalised recommendations
           </div>
           <ul className="space-y-2">
-            {recs.slice(0, 7).map((r, idx) => (
+            {recs.slice(0, 16).map((r, idx) => (
               <li key={idx} className="text-[11px] text-slate-600">
                 {r}
               </li>
