@@ -276,28 +276,19 @@ export const PersonalizationPanel: React.FC<Props> = ({
 
           <div className="md:col-span-2">
             <div className="text-xs font-medium text-slate-700 mb-2">
-              🏗️ Outdoor activity / work
+              Outdoor activity / work
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {ACTIVITIES.map((a) => {
-                const kindEmoji =
-                  a.kind === "Work" ? "💼" : a.kind === "Sport" ? "🏃" : "🏖️";
-                return (
+              {ACTIVITIES.map((a) => (
                 <div
                   key={a.id}
                   className="rounded-2xl border border-slate-200 bg-white p-3"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-base leading-none shrink-0" aria-hidden="true">
-                        {a.icon}
-                      </span>
-                      <div className="text-xs font-semibold text-slate-900 truncate">
-                        {a.label}
-                      </div>
+                    <div className="text-xs font-semibold text-slate-900 truncate min-w-0">
+                      {a.label}
                     </div>
-                    <div className="text-[10px] text-slate-500 shrink-0 flex items-center gap-0.5">
-                      <span aria-hidden="true">{kindEmoji}</span>
+                    <div className="text-[10px] text-slate-500 shrink-0">
                       {a.kind}
                     </div>
                   </div>
@@ -331,8 +322,7 @@ export const PersonalizationPanel: React.FC<Props> = ({
                     ))}
                   </div>
                 </div>
-              );
-              })}
+              ))}
             </div>
           </div>
         </div>

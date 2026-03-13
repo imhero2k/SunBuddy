@@ -119,20 +119,19 @@ export type ActivityId =
 
 export type Activity = {
   id: ActivityId;
-  icon: string;
   label: string;
   kind: "Work" | "Sport" | "Leisure";
   baseWeight: number; // higher = more UV exposure likelihood
 };
 
 export const ACTIVITIES: Activity[] = [
-  { id: "construction", icon: "🏗️", label: "Construction / trade work", kind: "Work", baseWeight: 4 },
-  { id: "gardening", icon: "🪴", label: "Gardening / outdoor chores", kind: "Work", baseWeight: 3 },
-  { id: "running", icon: "🏃", label: "Running", kind: "Sport", baseWeight: 2 },
-  { id: "cycling", icon: "🚴", label: "Cycling", kind: "Sport", baseWeight: 3 },
-  { id: "team_sport", icon: "⚽", label: "Team sport training/matches", kind: "Sport", baseWeight: 3 },
-  { id: "surfing", icon: "🏄", label: "Surfing / beach time", kind: "Leisure", baseWeight: 4 },
-  { id: "outdoor_cafe", icon: "☕", label: "Outdoor dining / walking", kind: "Leisure", baseWeight: 1 }
+  { id: "construction", label: "Construction / trade work", kind: "Work", baseWeight: 4 },
+  { id: "gardening", label: "Gardening / outdoor chores", kind: "Work", baseWeight: 3 },
+  { id: "running", label: "Running", kind: "Sport", baseWeight: 2 },
+  { id: "cycling", label: "Cycling", kind: "Sport", baseWeight: 3 },
+  { id: "team_sport", label: "Team sport training/matches", kind: "Sport", baseWeight: 3 },
+  { id: "surfing", label: "Surfing / beach time", kind: "Leisure", baseWeight: 4 },
+  { id: "outdoor_cafe", label: "Outdoor dining / walking", kind: "Leisure", baseWeight: 1 }
 ];
 
 export type HoursBand = "0-2" | "2-5" | "5-10" | "10+";
