@@ -46,7 +46,7 @@ export const LocationSelector: React.FC<Props> = ({ onLocationChange }) => {
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value.trim())}&format=json&limit=8&addressdetails=1`;
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value.trim())}&format=json&limit=8&addressdetails=1&countrycodes=au`;
         const res = await fetch(url, { headers: { "Accept-Language": "en" } });
         const json = (await res.json()) as GeoResult[];
         setResults(json);
