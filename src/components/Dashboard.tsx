@@ -15,7 +15,6 @@ export type DashboardData = {
   sunscreenSpf: string;
   vitaminDStatus: string;
   uvExposureStatus: string;
-  arpansaStation?: string;
 };
 
 const initialData: DashboardData = {
@@ -131,7 +130,7 @@ export const Dashboard: React.FC = () => {
             });
 
             if (maxUv > 0 && points[maxIndex]?.time) {
-              const peakTime = new Date(points[maxIndex].time);
+              const peakTime = new Date(points[maxIndex].time!);
               const formattedTime = peakTime.toLocaleTimeString(undefined, {
                 hour: "numeric",
                 minute: "2-digit",
@@ -201,7 +200,7 @@ export const Dashboard: React.FC = () => {
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <MinimalUvCard value={data.minimalUv} station={data.arpansaStation} />
+        <MinimalUvCard value={data.minimalUv} />
         <SimpleStatCard
           title="Cloud Cover"
           value={`${data.cloudCover ?? 0} %`}

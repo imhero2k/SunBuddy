@@ -1,12 +1,18 @@
 import React, { useState, useRef } from "react";
 
 type GeoResult = {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  admin1?: string;
-  country?: string;
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+  address?: {
+    suburb?: string;
+    neighbourhood?: string;
+    town?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  };
 };
 
 type Props = {
@@ -40,10 +46,10 @@ export const LocationSelector: React.FC<Props> = ({ onLocationChange }) => {
     debounceRef.current = setTimeout(async () => {
       setSearching(true);
       try {
-        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(value.trim())}&count=8&language=en&format=json`;
-        const res = await fetch(url);
-        const json = (await res.json()) as { results?: GeoResult[] };
-        setResults(json.results ?? []);
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value.trim())}&format=json&limit=8&addressdetails=1`;
+        const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+        const json = (await res.json()) as GeoResult[];
+        setResults(json);
         setShowDropdown(true);
       } catch {
         setError("Could not search for locations");
@@ -56,13 +62,14 @@ export const LocationSelector: React.FC<Props> = ({ onLocationChange }) => {
   };
 
   const handleSelect = (r: GeoResult) => {
-    const parts = [r.name, r.admin1, r.country].filter(Boolean);
-    const label = parts.join(", ");
+    const addr = r.address ?? {};
+    const suburb = addr.suburb ?? addr.neighbourhood ?? addr.town ?? addr.city ?? "";
+    const label = [suburb, addr.state, addr.country].filter(Boolean).join(", ") || r.display_name;
     setQuery(label);
     setSelectedLabel(label);
     setResults([]);
     setShowDropdown(false);
-    onLocationChange(r.latitude, r.longitude);
+    onLocationChange(parseFloat(r.lat), parseFloat(r.lon));
   };
 
   const handleUseCurrentLocation = async () => {
@@ -143,9 +150,11 @@ export const LocationSelector: React.FC<Props> = ({ onLocationChange }) => {
           {showDropdown && results.length > 0 && (
             <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg overflow-hidden">
               {results.map((r) => {
-                const label = [r.name, r.admin1, r.country].filter(Boolean).join(", ");
+                const addr = r.address ?? {};
+                const suburb = addr.suburb ?? addr.neighbourhood ?? addr.town ?? addr.city ?? "";
+                const label = [suburb, addr.state, addr.country].filter(Boolean).join(", ") || r.display_name;
                 return (
-                  <li key={r.id}>
+                  <li key={r.place_id}>
                     <button
                       type="button"
                       onMouseDown={() => handleSelect(r)}
