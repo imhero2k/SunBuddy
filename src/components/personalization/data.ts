@@ -5,6 +5,7 @@ export type FitzpatrickType = {
   name: string;
   description: string;
   typicalResponse: string;
+  color: string;
 };
 
 export const FITZPATRICK_TYPES: FitzpatrickType[] = [
@@ -12,37 +13,43 @@ export const FITZPATRICK_TYPES: FitzpatrickType[] = [
     id: "I",
     name: "Type I",
     description: "Very fair skin",
-    typicalResponse: "Always burns, never tans"
+    typicalResponse: "Always burns, never tans",
+    color: "#FDEBD3"
   },
   {
     id: "II",
     name: "Type II",
     description: "Fair skin",
-    typicalResponse: "Usually burns, tans minimally"
+    typicalResponse: "Usually burns, tans minimally",
+    color: "#F5D5B8"
   },
   {
     id: "III",
     name: "Type III",
     description: "Medium skin",
-    typicalResponse: "Sometimes mild burn, gradually tans"
+    typicalResponse: "Sometimes mild burn, gradually tans",
+    color: "#D7A97C"
   },
   {
     id: "IV",
     name: "Type IV",
     description: "Olive / light brown skin",
-    typicalResponse: "Rarely burns, tans easily"
+    typicalResponse: "Rarely burns, tans easily",
+    color: "#C68E5A"
   },
   {
     id: "V",
     name: "Type V",
     description: "Brown skin",
-    typicalResponse: "Very rarely burns, tans very easily"
+    typicalResponse: "Very rarely burns, tans very easily",
+    color: "#8D5C3E"
   },
   {
     id: "VI",
     name: "Type VI",
     description: "Deeply pigmented skin",
-    typicalResponse: "Almost never burns"
+    typicalResponse: "Almost never burns",
+    color: "#5A3825"
   }
 ];
 
@@ -52,15 +59,17 @@ export type SensitivityItem = {
   category: "Medication" | "Skin product";
   photosensitivity: "Yes" | "Possible" | "Unknown";
   note: string;
+  examples?: string[];
 };
 
 export const SENSITIVITY_ITEMS: SensitivityItem[] = [
   {
     id: "doxycycline",
-    label: "Doxycycline (antibiotic)",
+    label: "Tetracycline antibiotics",
     category: "Medication",
     photosensitivity: "Yes",
-    note: "Can increase sunburn risk."
+    note: "Can increase sunburn risk.",
+    examples: ["Doxycycline", "Minocycline", "Tetracycline"]
   },
   {
     id: "isotretinoin",
@@ -110,19 +119,20 @@ export type ActivityId =
 
 export type Activity = {
   id: ActivityId;
+  icon: string;
   label: string;
   kind: "Work" | "Sport" | "Leisure";
   baseWeight: number; // higher = more UV exposure likelihood
 };
 
 export const ACTIVITIES: Activity[] = [
-  { id: "construction", label: "Construction / trade work", kind: "Work", baseWeight: 4 },
-  { id: "gardening", label: "Gardening / outdoor chores", kind: "Work", baseWeight: 3 },
-  { id: "running", label: "Running", kind: "Sport", baseWeight: 2 },
-  { id: "cycling", label: "Cycling", kind: "Sport", baseWeight: 3 },
-  { id: "team_sport", label: "Team sport training/matches", kind: "Sport", baseWeight: 3 },
-  { id: "surfing", label: "Surfing / beach time", kind: "Leisure", baseWeight: 4 },
-  { id: "outdoor_cafe", label: "Outdoor dining / walking", kind: "Leisure", baseWeight: 1 }
+  { id: "construction", icon: "🏗️", label: "Construction / trade work", kind: "Work", baseWeight: 4 },
+  { id: "gardening", icon: "🪴", label: "Gardening / outdoor chores", kind: "Work", baseWeight: 3 },
+  { id: "running", icon: "🏃", label: "Running", kind: "Sport", baseWeight: 2 },
+  { id: "cycling", icon: "🚴", label: "Cycling", kind: "Sport", baseWeight: 3 },
+  { id: "team_sport", icon: "⚽", label: "Team sport training/matches", kind: "Sport", baseWeight: 3 },
+  { id: "surfing", icon: "🏄", label: "Surfing / beach time", kind: "Leisure", baseWeight: 4 },
+  { id: "outdoor_cafe", icon: "☕", label: "Outdoor dining / walking", kind: "Leisure", baseWeight: 1 }
 ];
 
 export type HoursBand = "0-2" | "2-5" | "5-10" | "10+";

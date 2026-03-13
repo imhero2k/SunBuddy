@@ -35,6 +35,19 @@ const DEFAULT_ACTIVITIES: Record<ActivityId, HoursBand | null> = {
   outdoor_cafe: null
 };
 
+/** Returns dark readable text on light bg, light text on dark bg */
+function contrastTextOnHex(hex: string): { primary: string; secondary: string } {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16) || 0;
+  const g = parseInt(h.slice(2, 4), 16) || 0;
+  const b = parseInt(h.slice(4, 6), 16) || 0;
+  const y = (r * 299 + g * 587 + b * 114) / 1000;
+  if (y > 160) {
+    return { primary: "#0f172a", secondary: "rgba(15,23,42,0.75)" };
+  }
+  return { primary: "#fafafa", secondary: "rgba(250,250,250,0.85)" };
+}
+
 export const PersonalizationPanel: React.FC<Props> = ({
   currentUv,
   peakUvNext24h
@@ -112,29 +125,38 @@ export const PersonalizationPanel: React.FC<Props> = ({
             <div className="text-xs font-medium text-slate-700 mb-2">
               Fitzpatrick skin type
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {FITZPATRICK_TYPES.map((t) => {
                 const selected = prefs.skinType === t.id;
+                const { primary, secondary } = contrastTextOnHex(t.color);
                 return (
                   <button
                     key={t.id}
                     className={[
-                      "text-left rounded-2xl border px-3 py-2",
+                      "text-left rounded-2xl border-2 min-h-[5.5rem] px-4 py-3 shadow-sm transition-transform active:scale-[0.98]",
                       selected
-                        ? "border-slate-900 bg-slate-900 text-white"
-                        : "border-slate-200 bg-white text-slate-900"
+                        ? "ring-2 ring-slate-900 ring-offset-2 scale-[1.02] shadow-md"
+                        : "border-black/10 hover:border-black/20"
                     ].join(" ")}
+                    style={{
+                      backgroundColor: t.color,
+                      borderColor: selected ? "rgb(15 23 42)" : "rgba(0,0,0,0.08)",
+                      color: primary
+                    }}
                     onClick={() =>
                       setPrefs((p) => ({ ...p, skinType: t.id }))
                     }
                     type="button"
                   >
-                    <div className="text-xs font-semibold">{t.name}</div>
                     <div
-                      className={[
-                        "text-[11px] mt-1",
-                        selected ? "text-white/80" : "text-slate-500"
-                      ].join(" ")}
+                      className="text-sm font-bold tracking-tight"
+                      style={{ color: primary }}
+                    >
+                      {t.name}
+                    </div>
+                    <div
+                      className="text-[11px] mt-2 leading-snug font-medium"
+                      style={{ color: secondary }}
                     >
                       {t.typicalResponse}
                     </div>
@@ -177,6 +199,23 @@ export const PersonalizationPanel: React.FC<Props> = ({
                     <div className="text-[11px] text-slate-500 mt-1">
                       {item.note}
                     </div>
+                    {checked && item.examples && item.examples.length > 0 && (
+                      <ul className="mt-2 flex flex-wrap gap-1">
+                        {item.examples.map((ex) => (
+                          <li
+                            key={ex}
+                            className={[
+                              "px-2 py-1 rounded-full text-[10px] border",
+                              checked
+                                ? "border-orange-200 bg-white text-slate-700"
+                                : "border-slate-200 bg-white text-slate-600"
+                            ].join(" ")}
+                          >
+                            {ex}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </button>
                 );
               })}
@@ -237,19 +276,30 @@ export const PersonalizationPanel: React.FC<Props> = ({
 
           <div className="md:col-span-2">
             <div className="text-xs font-medium text-slate-700 mb-2">
-              Outdoor activity / work
+              🏗️ Outdoor activity / work
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {ACTIVITIES.map((a) => (
+              {ACTIVITIES.map((a) => {
+                const kindEmoji =
+                  a.kind === "Work" ? "💼" : a.kind === "Sport" ? "🏃" : "🏖️";
+                return (
                 <div
                   key={a.id}
                   className="rounded-2xl border border-slate-200 bg-white p-3"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-semibold text-slate-900">
-                      {a.label}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-base leading-none shrink-0" aria-hidden="true">
+                        {a.icon}
+                      </span>
+                      <div className="text-xs font-semibold text-slate-900 truncate">
+                        {a.label}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-slate-500">{a.kind}</div>
+                    <div className="text-[10px] text-slate-500 shrink-0 flex items-center gap-0.5">
+                      <span aria-hidden="true">{kindEmoji}</span>
+                      {a.kind}
+                    </div>
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
                     <button
@@ -281,7 +331,8 @@ export const PersonalizationPanel: React.FC<Props> = ({
                     ))}
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           </div>
         </div>
