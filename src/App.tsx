@@ -3,6 +3,7 @@ import { Dashboard } from "./components/Dashboard";
 import { PersonalisationPage } from "./components/PersonalisationPage";
 import { GeneralInfoPage } from "./components/GeneralInfoPage";
 import { AboutUsPage } from "./components/AboutUsPage";
+import { ProtectYourSkinPage } from "./components/ProtectYourSkinPage";
 import { auth } from "./firebase";
 import { apiFetch } from "./api";
 import {
@@ -15,7 +16,7 @@ import {
 
 const App: React.FC = () => {
   const [tab, setTab] = useState<
-    "dashboard" | "personalisation" | "general" | "about"
+    "dashboard" | "personalisation" | "protect" | "general" | "about"
   >("dashboard");
   const [currentUv, setCurrentUv] = useState<number>(0);
   const [peakUv, setPeakUv] = useState<number | null>(null);
@@ -111,6 +112,18 @@ const App: React.FC = () => {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setTab("protect")}
+                  className={[
+                    "px-3 py-1 rounded-full text-xs border",
+                    tab === "protect"
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "bg-white text-orange-600 border-orange-200"
+                  ].join(" ")}
+                >
+                  Protect your skin
+                </button>
+                <button
+                  type="button"
                   onClick={() => setTab("general")}
                   className={[
                     "px-3 py-1 rounded-full text-xs border",
@@ -158,6 +171,8 @@ const App: React.FC = () => {
                 currentUv={currentUv}
                 peakUvNext24h={peakUv}
               />
+            ) : tab === "protect" ? (
+              <ProtectYourSkinPage />
             ) : tab === "general" ? (
               <GeneralInfoPage />
             ) : (
