@@ -5,6 +5,7 @@ export type FitzpatrickType = {
   name: string;
   description: string;
   typicalResponse: string;
+  color: string;
 };
 
 export const FITZPATRICK_TYPES: FitzpatrickType[] = [
@@ -12,37 +13,43 @@ export const FITZPATRICK_TYPES: FitzpatrickType[] = [
     id: "I",
     name: "Type I",
     description: "Very fair skin",
-    typicalResponse: "Always burns, never tans"
+    typicalResponse: "Always burns, never tans",
+    color: "#FDEBD3"
   },
   {
     id: "II",
     name: "Type II",
     description: "Fair skin",
-    typicalResponse: "Usually burns, tans minimally"
+    typicalResponse: "Usually burns, tans minimally",
+    color: "#F5D5B8"
   },
   {
     id: "III",
     name: "Type III",
     description: "Medium skin",
-    typicalResponse: "Sometimes mild burn, gradually tans"
+    typicalResponse: "Sometimes mild burn, gradually tans",
+    color: "#D7A97C"
   },
   {
     id: "IV",
     name: "Type IV",
     description: "Olive / light brown skin",
-    typicalResponse: "Rarely burns, tans easily"
+    typicalResponse: "Rarely burns, tans easily",
+    color: "#C68E5A"
   },
   {
     id: "V",
     name: "Type V",
     description: "Brown skin",
-    typicalResponse: "Very rarely burns, tans very easily"
+    typicalResponse: "Very rarely burns, tans very easily",
+    color: "#8D5C3E"
   },
   {
     id: "VI",
     name: "Type VI",
     description: "Deeply pigmented skin",
-    typicalResponse: "Almost never burns"
+    typicalResponse: "Almost never burns",
+    color: "#5A3825"
   }
 ];
 
@@ -52,15 +59,17 @@ export type SensitivityItem = {
   category: "Medication" | "Skin product";
   photosensitivity: "Yes" | "Possible" | "Unknown";
   note: string;
+  examples?: string[];
 };
 
 export const SENSITIVITY_ITEMS: SensitivityItem[] = [
   {
     id: "doxycycline",
-    label: "Doxycycline (antibiotic)",
+    label: "Tetracycline antibiotics",
     category: "Medication",
     photosensitivity: "Yes",
-    note: "Can increase sunburn risk."
+    note: "Can increase sunburn risk.",
+    examples: ["Doxycycline", "Minocycline", "Tetracycline"]
   },
   {
     id: "isotretinoin",
@@ -132,5 +141,58 @@ export const HOURS_BANDS: { id: HoursBand; label: string; hoursApprox: number }[
   { id: "2-5", label: "2–5 hrs/week", hoursApprox: 3.5 },
   { id: "5-10", label: "5–10 hrs/week", hoursApprox: 7.5 },
   { id: "10+", label: "10+ hrs/week", hoursApprox: 12 }
+];
+
+export type ClothingCoverageId =
+  | "swimwear"
+  | "tshirt_shorts"
+  | "tshirt_long_pants"
+  | "long_sleeves_shorts"
+  | "long_sleeves_long_pants";
+
+export type ClothingCoverageOption = {
+  id: ClothingCoverageId;
+  icon: string;
+  label: string;
+  detail: string;
+  exposedFraction: number; // 0..1 of body skin typically exposed
+};
+
+export const CLOTHING_COVERAGE_OPTIONS: ClothingCoverageOption[] = [
+  {
+    id: "swimwear",
+    icon: "👙",
+    label: "Swimwear",
+    detail: "Most skin exposed",
+    exposedFraction: 1
+  },
+  {
+    id: "tshirt_shorts",
+    icon: "👕🩳",
+    label: "T‑shirt + shorts",
+    detail: "Arms + lower legs exposed",
+    exposedFraction: 0.611
+  },
+  {
+    id: "tshirt_long_pants",
+    icon: "👕👖",
+    label: "T‑shirt + long pants",
+    detail: "Arms exposed",
+    exposedFraction: 0.389
+  },
+  {
+    id: "long_sleeves_shorts",
+    icon: "🧥🩳",
+    label: "Long sleeves + shorts",
+    detail: "Lower legs exposed",
+    exposedFraction: 0.389
+  },
+  {
+    id: "long_sleeves_long_pants",
+    icon: "🧥👖",
+    label: "Long sleeves + long pants",
+    detail: "Only face/neck/hands exposed",
+    exposedFraction: 0.2
+  }
 ];
 

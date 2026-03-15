@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Dashboard } from "./components/Dashboard";
 import { PersonalisationPage } from "./components/PersonalisationPage";
+import { GeneralInfoPage } from "./components/GeneralInfoPage";
+import { AboutUsPage } from "./components/AboutUsPage";
 import { auth } from "./firebase";
 import { apiFetch } from "./api";
 import {
@@ -12,7 +14,9 @@ import {
 } from "firebase/auth";
 
 const App: React.FC = () => {
-  const [tab, setTab] = useState<"dashboard" | "personalisation">("dashboard");
+  const [tab, setTab] = useState<
+    "dashboard" | "personalisation" | "general" | "about"
+  >("dashboard");
   const [currentUv, setCurrentUv] = useState<number>(0);
   const [peakUv, setPeakUv] = useState<number | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -49,17 +53,25 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b border-white/60 bg-card-bg/80 backdrop-blur px-8 py-4">
+      <header className="border-b border-orange-200 bg-card-bg/80 backdrop-blur px-8 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-sm font-semibold">
+            <div className="w-8 h-8 rounded-2xl bg-orange-500 text-white flex items-center justify-center text-sm font-semibold">
               SB
             </div>
+            <svg
+              className="w-6 h-6 text-orange-500 shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M12 2.25a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM12 21a.75.75 0 01-.75-.75v-1.5a.75.75 0 011.5 0V20.25a.75.75 0 01-.75.75zM3.75 12a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5H4.5a.75.75 0 01-.75-.75zM20.25 12a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM5.636 5.636a.75.75 0 011.06 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zM17.243 17.243a.75.75 0 011.06 0l1.06 1.06a.75.75 0 01-1.06 1.061l-1.06-1.06a.75.75 0 010-1.06zM5.636 18.364a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06l-1.06 1.06a.75.75 0 01-1.06 0zM17.243 6.757a.75.75 0 010-1.06l1.06-1.06a.75.75 0 111.06 1.06l-1.06 1.06a.75.75 0 01-1.06 0zM12 8.25a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z" />
+            </svg>
             <div>
-              <div className="text-sm font-semibold text-slate-900">
+              <div className="text-sm font-semibold text-orange-600">
                 SunBuddy
               </div>
-              <div className="text-xs text-slate-500">
+              <div className="text-xs text-orange-500">
                 Sun safety dashboard
               </div>
             </div>
@@ -67,10 +79,10 @@ const App: React.FC = () => {
           {user ? (
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col text-right">
-                <span className="text-xs text-slate-900 font-medium">
+                <span className="text-xs text-orange-700 font-medium">
                   {user.displayName || user.email}
                 </span>
-                <span className="text-[10px] text-slate-500">Signed in</span>
+                <span className="text-[10px] text-orange-500">Signed in</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -79,8 +91,8 @@ const App: React.FC = () => {
                   className={[
                     "px-3 py-1 rounded-full text-xs border",
                     tab === "dashboard"
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white text-slate-600 border-slate-200"
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "bg-white text-orange-600 border-orange-200"
                   ].join(" ")}
                 >
                   Dashboard
@@ -91,17 +103,41 @@ const App: React.FC = () => {
                   className={[
                     "px-3 py-1 rounded-full text-xs border",
                     tab === "personalisation"
-                      ? "bg-slate-900 text-white border-slate-900"
-                      : "bg-white text-slate-600 border-slate-200"
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "bg-white text-orange-600 border-orange-200"
                   ].join(" ")}
                 >
                   Personalisation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("general")}
+                  className={[
+                    "px-3 py-1 rounded-full text-xs border",
+                    tab === "general"
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "bg-white text-orange-600 border-orange-200"
+                  ].join(" ")}
+                >
+                  General info
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("about")}
+                  className={[
+                    "px-3 py-1 rounded-full text-xs border",
+                    tab === "about"
+                      ? "bg-orange-500 text-white border-orange-500"
+                      : "bg-white text-orange-600 border-orange-200"
+                  ].join(" ")}
+                >
+                  About us
                 </button>
               </div>
               <button
                 type="button"
                 onClick={() => signOut(auth)}
-                className="text-[11px] text-slate-500 underline underline-offset-2"
+                className="text-[11px] text-orange-600 underline underline-offset-2 hover:text-orange-700"
               >
                 Sign out
               </button>
@@ -117,11 +153,15 @@ const App: React.FC = () => {
           ) : user ? (
             tab === "dashboard" ? (
               <Dashboard />
-            ) : (
+            ) : tab === "personalisation" ? (
               <PersonalisationPage
                 currentUv={currentUv}
                 peakUvNext24h={peakUv}
               />
+            ) : tab === "general" ? (
+              <GeneralInfoPage />
+            ) : (
+              <AboutUsPage />
             )
           ) : (
             <div className="flex flex-col items-center justify-center gap-4 py-16">
