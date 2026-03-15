@@ -108,56 +108,6 @@ export const SENSITIVITY_ITEMS: SensitivityItem[] = [
   }
 ];
 
-/** Optional common conditions—used for tailored sun-safety tips (not a diagnosis). */
-export type SkinConditionItem = {
-  id: string;
-  label: string;
-  note: string;
-};
-
-export const SKIN_CONDITION_ITEMS: SkinConditionItem[] = [
-  {
-    id: "eczema",
-    label: "Eczema / atopic dermatitis",
-    note: "Skin barrier is often weaker; some sunscreens sting—patch test new products."
-  },
-  {
-    id: "psoriasis",
-    label: "Psoriasis",
-    note: "Controlled sun can help some people; burning or overexposure can trigger flares."
-  },
-  {
-    id: "rosacea",
-    label: "Rosacea",
-    note: "Heat and UV commonly trigger flushing and flare-ups."
-  },
-  {
-    id: "acne",
-    label: "Acne-prone skin",
-    note: "Still need daily SPF; choose non-comedogenic, oil-free formulas if you prefer."
-  },
-  {
-    id: "melasma",
-    label: "Melasma / dark patches",
-    note: "Sun quickly worsens pigmentation—strict protection and reapplication matter."
-  },
-  {
-    id: "vitiligo",
-    label: "Vitiligo",
-    note: "Depigmented areas burn more easily—extra SPF and covering those spots helps."
-  },
-  {
-    id: "skin_cancer_history",
-    label: "Skin cancer history or many moles",
-    note: "Higher priority for protection, shade, and regular skin checks with a clinician."
-  },
-  {
-    id: "contact_dermatitis",
-    label: "Sensitive skin / contact dermatitis",
-    note: "Fragrance and some filters irritate—fragrance-free and minimal-ingredient SPF often suit better."
-  }
-];
-
 export type ActivityId =
   | "construction"
   | "gardening"
