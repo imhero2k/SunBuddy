@@ -63,10 +63,21 @@ export async function getDashboardSnapshot(
 
   try {
     const { uv, cloudCover } = await fetchOpenMeteoCurrentWeather(useLat, useLon);
-    const classification = classifyFromUv(uv);
 
+    // If Open-Meteo returns 0, fill current UV from ARPANSA (Australian stations)
+    let uvToUse = uv;
+    if (uv === 0) {
+      try {
+        const { uvi } = await fetchArpansaUv(useLat, useLon);
+        uvToUse = uvi;
+      } catch {
+        // keep 0
+      }
+    }
+
+    const classification = classifyFromUv(uvToUse);
     return {
-      minimalUv: uv,
+      minimalUv: uvToUse,
       time,
       peakUvTime: "—",
       peakUvLevel: 0,
