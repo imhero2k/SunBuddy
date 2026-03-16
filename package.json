@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "test": "vitest run --reporter=dot",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -24,6 +25,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/cors": "^2.8.17",
