@@ -1,5 +1,6 @@
 import type { DashboardData } from "../types";
 import { fetchOpenMeteoCurrentWeather } from "../clients/openMeteo";
+import { fetchArpansaUv } from "../clients/arpansa";
 
 function classifyFromUv(uvi: number): Pick<
   DashboardData,
@@ -74,18 +75,34 @@ export async function getDashboardSnapshot(
     };
   } catch (err) {
     console.error("[dashboard] Open-Meteo current weather failed:", err instanceof Error ? err.message : err);
-    return {
-      minimalUv: 0,
-      time,
-      peakUvTime: "—",
-      peakUvLevel: 0,
-      cloudCover: 0,
-      burnRisk: "No Risk",
-      sunscreenNeed: "No Need",
-      sunscreenSpf: "SPF 15+",
-      vitaminDStatus: "No intake currently",
-      uvExposureStatus: "No risk currently"
-    };
+
+    // Fallback: current UV from ARPANSA (Australian stations)
+    try {
+      const { uvi } = await fetchArpansaUv(useLat, useLon);
+      const classification = classifyFromUv(uvi);
+      return {
+        minimalUv: uvi,
+        time,
+        peakUvTime: "—",
+        peakUvLevel: 0,
+        cloudCover: 0,
+        ...classification
+      };
+    } catch (fallbackErr) {
+      console.error("[dashboard] ARPANSA fallback failed:", fallbackErr instanceof Error ? fallbackErr.message : fallbackErr);
+      return {
+        minimalUv: 0,
+        time,
+        peakUvTime: "—",
+        peakUvLevel: 0,
+        cloudCover: 0,
+        burnRisk: "No Risk",
+        sunscreenNeed: "No Need",
+        sunscreenSpf: "SPF 15+",
+        vitaminDStatus: "No intake currently",
+        uvExposureStatus: "No risk currently"
+      };
+    }
   }
 }
 
