@@ -1,0 +1,665 @@
+{
+  "dataset": "Melanoma of the skin",
+  "sourceFile": "data.xlsx",
+  "yearRange": {
+    "start": 2001,
+    "end": 2021
+  },
+  "defaultMetric": "ageStandardisedRate2001",
+  "availableMetrics": [
+    {
+      "key": "count",
+      "label": "Count",
+      "unit": "cases"
+    },
+    {
+      "key": "crudeRate",
+      "label": "Crude rate",
+      "unit": "per 100,000"
+    },
+    {
+      "key": "ageStandardisedRate2001",
+      "label": "Age-standardised rate (2001 Australian Standard Population)",
+      "unit": "per 100,000"
+    },
+    {
+      "key": "ageStandardisedRate2025",
+      "label": "Age-standardised rate (2025 Australian population)",
+      "unit": "per 100,000"
+    }
+  ],
+  "series": [
+    {
+      "year": 2001,
+      "male": {
+        "count": 5113,
+        "totalCount": 5113,
+        "crudeRate": 53.5,
+        "ageStandardisedRate2001": 56.5,
+        "ageStandardisedRate2025": 67.6,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 3916,
+        "totalCount": 3916,
+        "crudeRate": 40.3,
+        "ageStandardisedRate2001": 39.1,
+        "ageStandardisedRate2025": 44.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2002,
+      "male": {
+        "count": 5634,
+        "totalCount": 5634,
+        "crudeRate": 58.2,
+        "ageStandardisedRate2001": 60.8,
+        "ageStandardisedRate2025": 72.7,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4251,
+        "totalCount": 4251,
+        "crudeRate": 43.3,
+        "ageStandardisedRate2001": 41.6,
+        "ageStandardisedRate2025": 47.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2003,
+      "male": {
+        "count": 5595,
+        "totalCount": 5595,
+        "crudeRate": 57.2,
+        "ageStandardisedRate2001": 59.3,
+        "ageStandardisedRate2025": 71.2,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4037,
+        "totalCount": 4037,
+        "crudeRate": 40.6,
+        "ageStandardisedRate2001": 38.8,
+        "ageStandardisedRate2025": 43.9,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2004,
+      "male": {
+        "count": 5608,
+        "totalCount": 5608,
+        "crudeRate": 56.7,
+        "ageStandardisedRate2001": 58.3,
+        "ageStandardisedRate2025": 70.7,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4289,
+        "totalCount": 4289,
+        "crudeRate": 42.7,
+        "ageStandardisedRate2001": 40.4,
+        "ageStandardisedRate2025": 46.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2005,
+      "male": {
+        "count": 6169,
+        "totalCount": 6169,
+        "crudeRate": 61.6,
+        "ageStandardisedRate2001": 62.8,
+        "ageStandardisedRate2025": 76.2,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4700,
+        "totalCount": 4700,
+        "crudeRate": 46.3,
+        "ageStandardisedRate2001": 43.5,
+        "ageStandardisedRate2025": 49.6,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2006,
+      "male": {
+        "count": 6115,
+        "totalCount": 6115,
+        "crudeRate": 60.2,
+        "ageStandardisedRate2001": 60.9,
+        "ageStandardisedRate2025": 74.3,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4328,
+        "totalCount": 4328,
+        "crudeRate": 42.1,
+        "ageStandardisedRate2001": 39.1,
+        "ageStandardisedRate2025": 45.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2007,
+      "male": {
+        "count": 6047,
+        "totalCount": 6047,
+        "crudeRate": 58.4,
+        "ageStandardisedRate2001": 58.4,
+        "ageStandardisedRate2025": 71.6,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4415,
+        "totalCount": 4415,
+        "crudeRate": 42.2,
+        "ageStandardisedRate2001": 39.1,
+        "ageStandardisedRate2025": 44.6,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2008,
+      "male": {
+        "count": 6543,
+        "totalCount": 6543,
+        "crudeRate": 61.9,
+        "ageStandardisedRate2001": 61.7,
+        "ageStandardisedRate2025": 75.5,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4621,
+        "totalCount": 4621,
+        "crudeRate": 43.3,
+        "ageStandardisedRate2001": 40.0,
+        "ageStandardisedRate2025": 45.8,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2009,
+      "male": {
+        "count": 6606,
+        "totalCount": 6606,
+        "crudeRate": 61.2,
+        "ageStandardisedRate2001": 60.8,
+        "ageStandardisedRate2025": 74.4,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4722,
+        "totalCount": 4722,
+        "crudeRate": 43.4,
+        "ageStandardisedRate2001": 39.9,
+        "ageStandardisedRate2025": 46.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2010,
+      "male": {
+        "count": 6810,
+        "totalCount": 6810,
+        "crudeRate": 62.1,
+        "ageStandardisedRate2001": 61.1,
+        "ageStandardisedRate2025": 75.2,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4718,
+        "totalCount": 4718,
+        "crudeRate": 42.6,
+        "ageStandardisedRate2001": 38.8,
+        "ageStandardisedRate2025": 45.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2011,
+      "male": {
+        "count": 6817,
+        "totalCount": 6817,
+        "crudeRate": 61.3,
+        "ageStandardisedRate2001": 59.1,
+        "ageStandardisedRate2025": 72.8,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 4850,
+        "totalCount": 4850,
+        "crudeRate": 43.2,
+        "ageStandardisedRate2001": 39.0,
+        "ageStandardisedRate2025": 45.4,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2012,
+      "male": {
+        "count": 7162,
+        "totalCount": 7162,
+        "crudeRate": 63.3,
+        "ageStandardisedRate2001": 60.7,
+        "ageStandardisedRate2025": 74.9,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 5091,
+        "totalCount": 5091,
+        "crudeRate": 44.6,
+        "ageStandardisedRate2001": 40.0,
+        "ageStandardisedRate2025": 46.4,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2013,
+      "male": {
+        "count": 7545,
+        "totalCount": 7545,
+        "crudeRate": 65.6,
+        "ageStandardisedRate2001": 62.3,
+        "ageStandardisedRate2025": 77.2,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 5353,
+        "totalCount": 5353,
+        "crudeRate": 46.1,
+        "ageStandardisedRate2001": 41.2,
+        "ageStandardisedRate2025": 47.9,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2014,
+      "male": {
+        "count": 7727,
+        "totalCount": 7727,
+        "crudeRate": 66.2,
+        "ageStandardisedRate2001": 62.4,
+        "ageStandardisedRate2025": 77.4,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 5497,
+        "totalCount": 5497,
+        "crudeRate": 46.6,
+        "ageStandardisedRate2001": 41.5,
+        "ageStandardisedRate2025": 48.2,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2015,
+      "male": {
+        "count": 8018,
+        "totalCount": 8018,
+        "crudeRate": 67.8,
+        "ageStandardisedRate2001": 63.2,
+        "ageStandardisedRate2025": 78.2,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 5723,
+        "totalCount": 5723,
+        "crudeRate": 47.7,
+        "ageStandardisedRate2001": 42.3,
+        "ageStandardisedRate2025": 49.3,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2016,
+      "male": {
+        "count": 8514,
+        "totalCount": 8514,
+        "crudeRate": 70.9,
+        "ageStandardisedRate2001": 65.5,
+        "ageStandardisedRate2025": 80.7,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 6044,
+        "totalCount": 6044,
+        "crudeRate": 49.6,
+        "ageStandardisedRate2001": 43.6,
+        "ageStandardisedRate2025": 51.0,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2017,
+      "male": {
+        "count": 8860,
+        "totalCount": 8860,
+        "crudeRate": 72.6,
+        "ageStandardisedRate2001": 66.4,
+        "ageStandardisedRate2025": 82.0,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 6149,
+        "totalCount": 6149,
+        "crudeRate": 49.6,
+        "ageStandardisedRate2001": 43.4,
+        "ageStandardisedRate2025": 50.7,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2018,
+      "male": {
+        "count": 8824,
+        "totalCount": 8824,
+        "crudeRate": 71.2,
+        "ageStandardisedRate2001": 64.7,
+        "ageStandardisedRate2025": 79.8,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 6326,
+        "totalCount": 6326,
+        "crudeRate": 50.3,
+        "ageStandardisedRate2001": 43.7,
+        "ageStandardisedRate2025": 51.1,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2019,
+      "male": {
+        "count": 9186,
+        "totalCount": 9186,
+        "crudeRate": 73.0,
+        "ageStandardisedRate2001": 65.5,
+        "ageStandardisedRate2025": 80.9,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 6517,
+        "totalCount": 6517,
+        "crudeRate": 51.1,
+        "ageStandardisedRate2001": 44.0,
+        "ageStandardisedRate2025": 51.6,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2020,
+      "male": {
+        "count": 8586,
+        "totalCount": 8586,
+        "crudeRate": 67.5,
+        "ageStandardisedRate2001": 59.3,
+        "ageStandardisedRate2025": 73.9,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 6163,
+        "totalCount": 6163,
+        "crudeRate": 47.7,
+        "ageStandardisedRate2001": 40.5,
+        "ageStandardisedRate2025": 47.4,
+        "proportionPercent": 100.0
+      }
+    },
+    {
+      "year": 2021,
+      "male": {
+        "count": 8854,
+        "totalCount": 8854,
+        "crudeRate": 69.4,
+        "ageStandardisedRate2001": 59.6,
+        "ageStandardisedRate2025": 74.6,
+        "proportionPercent": 100.0
+      },
+      "female": {
+        "count": 6170,
+        "totalCount": 6170,
+        "crudeRate": 47.7,
+        "ageStandardisedRate2001": 39.7,
+        "ageStandardisedRate2025": 46.7,
+        "proportionPercent": 100.0
+      }
+    }
+  ],
+  "chartData": [
+    {
+      "year": 2001,
+      "maleCount": 5113,
+      "femaleCount": 3916,
+      "maleCrudeRate": 53.5,
+      "femaleCrudeRate": 40.3,
+      "maleAgeStandardisedRate2001": 56.5,
+      "femaleAgeStandardisedRate2001": 39.1,
+      "maleAgeStandardisedRate2025": 67.6,
+      "femaleAgeStandardisedRate2025": 44.0
+    },
+    {
+      "year": 2002,
+      "maleCount": 5634,
+      "femaleCount": 4251,
+      "maleCrudeRate": 58.2,
+      "femaleCrudeRate": 43.3,
+      "maleAgeStandardisedRate2001": 60.8,
+      "femaleAgeStandardisedRate2001": 41.6,
+      "maleAgeStandardisedRate2025": 72.7,
+      "femaleAgeStandardisedRate2025": 47.0
+    },
+    {
+      "year": 2003,
+      "maleCount": 5595,
+      "femaleCount": 4037,
+      "maleCrudeRate": 57.2,
+      "femaleCrudeRate": 40.6,
+      "maleAgeStandardisedRate2001": 59.3,
+      "femaleAgeStandardisedRate2001": 38.8,
+      "maleAgeStandardisedRate2025": 71.2,
+      "femaleAgeStandardisedRate2025": 43.9
+    },
+    {
+      "year": 2004,
+      "maleCount": 5608,
+      "femaleCount": 4289,
+      "maleCrudeRate": 56.7,
+      "femaleCrudeRate": 42.7,
+      "maleAgeStandardisedRate2001": 58.3,
+      "femaleAgeStandardisedRate2001": 40.4,
+      "maleAgeStandardisedRate2025": 70.7,
+      "femaleAgeStandardisedRate2025": 46.0
+    },
+    {
+      "year": 2005,
+      "maleCount": 6169,
+      "femaleCount": 4700,
+      "maleCrudeRate": 61.6,
+      "femaleCrudeRate": 46.3,
+      "maleAgeStandardisedRate2001": 62.8,
+      "femaleAgeStandardisedRate2001": 43.5,
+      "maleAgeStandardisedRate2025": 76.2,
+      "femaleAgeStandardisedRate2025": 49.6
+    },
+    {
+      "year": 2006,
+      "maleCount": 6115,
+      "femaleCount": 4328,
+      "maleCrudeRate": 60.2,
+      "femaleCrudeRate": 42.1,
+      "maleAgeStandardisedRate2001": 60.9,
+      "femaleAgeStandardisedRate2001": 39.1,
+      "maleAgeStandardisedRate2025": 74.3,
+      "femaleAgeStandardisedRate2025": 45.0
+    },
+    {
+      "year": 2007,
+      "maleCount": 6047,
+      "femaleCount": 4415,
+      "maleCrudeRate": 58.4,
+      "femaleCrudeRate": 42.2,
+      "maleAgeStandardisedRate2001": 58.4,
+      "femaleAgeStandardisedRate2001": 39.1,
+      "maleAgeStandardisedRate2025": 71.6,
+      "femaleAgeStandardisedRate2025": 44.6
+    },
+    {
+      "year": 2008,
+      "maleCount": 6543,
+      "femaleCount": 4621,
+      "maleCrudeRate": 61.9,
+      "femaleCrudeRate": 43.3,
+      "maleAgeStandardisedRate2001": 61.7,
+      "femaleAgeStandardisedRate2001": 40.0,
+      "maleAgeStandardisedRate2025": 75.5,
+      "femaleAgeStandardisedRate2025": 45.8
+    },
+    {
+      "year": 2009,
+      "maleCount": 6606,
+      "femaleCount": 4722,
+      "maleCrudeRate": 61.2,
+      "femaleCrudeRate": 43.4,
+      "maleAgeStandardisedRate2001": 60.8,
+      "femaleAgeStandardisedRate2001": 39.9,
+      "maleAgeStandardisedRate2025": 74.4,
+      "femaleAgeStandardisedRate2025": 46.0
+    },
+    {
+      "year": 2010,
+      "maleCount": 6810,
+      "femaleCount": 4718,
+      "maleCrudeRate": 62.1,
+      "femaleCrudeRate": 42.6,
+      "maleAgeStandardisedRate2001": 61.1,
+      "femaleAgeStandardisedRate2001": 38.8,
+      "maleAgeStandardisedRate2025": 75.2,
+      "femaleAgeStandardisedRate2025": 45.0
+    },
+    {
+      "year": 2011,
+      "maleCount": 6817,
+      "femaleCount": 4850,
+      "maleCrudeRate": 61.3,
+      "femaleCrudeRate": 43.2,
+      "maleAgeStandardisedRate2001": 59.1,
+      "femaleAgeStandardisedRate2001": 39.0,
+      "maleAgeStandardisedRate2025": 72.8,
+      "femaleAgeStandardisedRate2025": 45.4
+    },
+    {
+      "year": 2012,
+      "maleCount": 7162,
+      "femaleCount": 5091,
+      "maleCrudeRate": 63.3,
+      "femaleCrudeRate": 44.6,
+      "maleAgeStandardisedRate2001": 60.7,
+      "femaleAgeStandardisedRate2001": 40.0,
+      "maleAgeStandardisedRate2025": 74.9,
+      "femaleAgeStandardisedRate2025": 46.4
+    },
+    {
+      "year": 2013,
+      "maleCount": 7545,
+      "femaleCount": 5353,
+      "maleCrudeRate": 65.6,
+      "femaleCrudeRate": 46.1,
+      "maleAgeStandardisedRate2001": 62.3,
+      "femaleAgeStandardisedRate2001": 41.2,
+      "maleAgeStandardisedRate2025": 77.2,
+      "femaleAgeStandardisedRate2025": 47.9
+    },
+    {
+      "year": 2014,
+      "maleCount": 7727,
+      "femaleCount": 5497,
+      "maleCrudeRate": 66.2,
+      "femaleCrudeRate": 46.6,
+      "maleAgeStandardisedRate2001": 62.4,
+      "femaleAgeStandardisedRate2001": 41.5,
+      "maleAgeStandardisedRate2025": 77.4,
+      "femaleAgeStandardisedRate2025": 48.2
+    },
+    {
+      "year": 2015,
+      "maleCount": 8018,
+      "femaleCount": 5723,
+      "maleCrudeRate": 67.8,
+      "femaleCrudeRate": 47.7,
+      "maleAgeStandardisedRate2001": 63.2,
+      "femaleAgeStandardisedRate2001": 42.3,
+      "maleAgeStandardisedRate2025": 78.2,
+      "femaleAgeStandardisedRate2025": 49.3
+    },
+    {
+      "year": 2016,
+      "maleCount": 8514,
+      "femaleCount": 6044,
+      "maleCrudeRate": 70.9,
+      "femaleCrudeRate": 49.6,
+      "maleAgeStandardisedRate2001": 65.5,
+      "femaleAgeStandardisedRate2001": 43.6,
+      "maleAgeStandardisedRate2025": 80.7,
+      "femaleAgeStandardisedRate2025": 51.0
+    },
+    {
+      "year": 2017,
+      "maleCount": 8860,
+      "femaleCount": 6149,
+      "maleCrudeRate": 72.6,
+      "femaleCrudeRate": 49.6,
+      "maleAgeStandardisedRate2001": 66.4,
+      "femaleAgeStandardisedRate2001": 43.4,
+      "maleAgeStandardisedRate2025": 82.0,
+      "femaleAgeStandardisedRate2025": 50.7
+    },
+    {
+      "year": 2018,
+      "maleCount": 8824,
+      "femaleCount": 6326,
+      "maleCrudeRate": 71.2,
+      "femaleCrudeRate": 50.3,
+      "maleAgeStandardisedRate2001": 64.7,
+      "femaleAgeStandardisedRate2001": 43.7,
+      "maleAgeStandardisedRate2025": 79.8,
+      "femaleAgeStandardisedRate2025": 51.1
+    },
+    {
+      "year": 2019,
+      "maleCount": 9186,
+      "femaleCount": 6517,
+      "maleCrudeRate": 73.0,
+      "femaleCrudeRate": 51.1,
+      "maleAgeStandardisedRate2001": 65.5,
+      "femaleAgeStandardisedRate2001": 44.0,
+      "maleAgeStandardisedRate2025": 80.9,
+      "femaleAgeStandardisedRate2025": 51.6
+    },
+    {
+      "year": 2020,
+      "maleCount": 8586,
+      "femaleCount": 6163,
+      "maleCrudeRate": 67.5,
+      "femaleCrudeRate": 47.7,
+      "maleAgeStandardisedRate2001": 59.3,
+      "femaleAgeStandardisedRate2001": 40.5,
+      "maleAgeStandardisedRate2025": 73.9,
+      "femaleAgeStandardisedRate2025": 47.4
+    },
+    {
+      "year": 2021,
+      "maleCount": 8854,
+      "femaleCount": 6170,
+      "maleCrudeRate": 69.4,
+      "femaleCrudeRate": 47.7,
+      "maleAgeStandardisedRate2001": 59.6,
+      "femaleAgeStandardisedRate2001": 39.7,
+      "maleAgeStandardisedRate2025": 74.6,
+      "femaleAgeStandardisedRate2025": 46.7
+    }
+  ]
+}

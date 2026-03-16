@@ -1,6 +1,69 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import trendsData from "../data/skin-cancer-context-trends.json";
+
+type MetricKey =
+  | "count"
+  | "crudeRate"
+  | "ageStandardisedRate2001"
+  | "ageStandardisedRate2025";
+
+const MALE_KEY: Record<MetricKey, string> = {
+  count: "maleCount",
+  crudeRate: "maleCrudeRate",
+  ageStandardisedRate2001: "maleAgeStandardisedRate2001",
+  ageStandardisedRate2025: "maleAgeStandardisedRate2025",
+};
+
+const FEMALE_KEY: Record<MetricKey, string> = {
+  count: "femaleCount",
+  crudeRate: "femaleCrudeRate",
+  ageStandardisedRate2001: "femaleAgeStandardisedRate2001",
+  ageStandardisedRate2025: "femaleAgeStandardisedRate2025",
+};
+
+const sources = [
+  {
+    name: "Australian Institute of Health and Welfare (AIHW)",
+    description: "National cancer statistics and skin cancer incidence data.",
+    url: "https://www.aihw.gov.au/reports/cancer/cancer-data-in-australia",
+  },
+  {
+    name: "Cancer Australia",
+    description: "Skin cancer prevention and early detection guidance.",
+    url: "https://www.canceraustralia.gov.au/cancer-types/skin-cancer",
+  },
+  {
+    name: "Cancer Council Australia",
+    description:
+      "Sun protection guidelines, SunSmart program, and UV resources.",
+    url: "https://www.cancer.org.au/cancer-information/causes-and-prevention/sun-safety",
+  },
+  {
+    name: "World Health Organization (WHO) – UV Index",
+    description: "Global UV index standards and public health advice.",
+    url: "https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index",
+  },
+];
 
 export const GeneralInfoPage: React.FC = () => {
+  const [metric, setMetric] = useState<MetricKey>(
+    trendsData.defaultMetric as MetricKey
+  );
+
+  const activeMetric = trendsData.availableMetrics.find((m) => m.key === metric)!;
+  const maleDataKey = MALE_KEY[metric];
+  const femaleDataKey = FEMALE_KEY[metric];
+
   return (
     <div className="space-y-6">
       <div>
@@ -17,17 +80,94 @@ export const GeneralInfoPage: React.FC = () => {
       </div>
 
       <article className="ios-card p-4 md:p-5">
-        <h2 className="text-sm font-semibold text-slate-900">
-          Historical skin cancer trends (graph)
-        </h2>
-        <div
-          className="mt-4 flex min-h-[220px] items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/80"
-          aria-hidden="true"
-        >
-          <span className="text-sm font-medium text-slate-400 tracking-wide">
-            Placeholder — graph goes here
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-900">
+              Historical melanoma trends (2001–2021)
+            </h2>
+            <p className="text-[10px] text-slate-500 mt-0.5">
+              Australia — by sex
+            </p>
+          </div>
+          <select
+            value={metric}
+            onChange={(e) => setMetric(e.target.value as MetricKey)}
+            className="text-[11px] rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-slate-700 focus:outline-none focus:ring-2 focus:ring-orange-400"
+          >
+            {trendsData.availableMetrics.map((m) => (
+              <option key={m.key} value={m.key}>
+                {m.label}
+              </option>
+            ))}
+          </select>
         </div>
+
+        <div className="mt-4" style={{ height: 260 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={trendsData.chartData}
+              margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis
+                dataKey="year"
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                tickLine={false}
+                axisLine={{ stroke: "#e2e8f0" }}
+              />
+              <YAxis
+                tick={{ fontSize: 10, fill: "#94a3b8" }}
+                tickLine={false}
+                axisLine={false}
+                width={48}
+                tickFormatter={(v) =>
+                  metric === "count"
+                    ? v >= 1000
+                      ? `${(v / 1000).toFixed(0)}k`
+                      : v
+                    : v
+                }
+              />
+              <Tooltip
+                contentStyle={{
+                  fontSize: 11,
+                  borderRadius: 10,
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                }}
+                formatter={(value: number) => [
+                  `${value.toLocaleString()} ${activeMetric.unit}`,
+                ]}
+              />
+              <Legend
+                iconType="circle"
+                iconSize={8}
+                wrapperStyle={{ fontSize: 11, paddingTop: 12 }}
+              />
+              <Line
+                type="monotone"
+                dataKey={maleDataKey}
+                name="Male"
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4 }}
+              />
+              <Line
+                type="monotone"
+                dataKey={femaleDataKey}
+                name="Female"
+                stroke="#f97316"
+                strokeWidth={2}
+                dot={false}
+                activeDot={{ r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="text-[10px] text-slate-400 mt-2">
+          Source: Australian Institute of Health and Welfare (AIHW).
+        </p>
       </article>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -81,15 +221,46 @@ export const GeneralInfoPage: React.FC = () => {
         <h2 className="text-sm font-semibold text-slate-900">
           Authoritative sources
         </h2>
-        <div
-          className="mt-4 flex min-h-[120px] items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/80"
-          aria-hidden="true"
-        >
-          <span className="text-sm font-medium text-slate-400 tracking-wide">
-            Placeholder — sources go here
-          </span>
-        </div>
-        <p className="text-[10px] text-slate-400 mt-3">
+        <ul className="mt-3 space-y-3">
+          {sources.map((s) => (
+            <li key={s.name} className="flex items-start gap-3">
+              <div className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-orange-50 flex items-center justify-center">
+                <svg
+                  className="w-3 h-3 text-orange-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M10.172 13.828a4 4 0 015.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                  />
+                </svg>
+              </div>
+              <div>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-semibold text-orange-500 hover:underline"
+                >
+                  {s.name}
+                </a>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  {s.description}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <p className="text-[10px] text-slate-400 mt-4">
           SunBuddy does not provide medical advice. For diagnosis or treatment, see
           a qualified health professional.
         </p>
