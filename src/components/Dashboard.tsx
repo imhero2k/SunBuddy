@@ -39,6 +39,7 @@ export const Dashboard: React.FC = () => {
   const [peakUvInfo, setPeakUvInfo] = useState<{ level: number; time: string } | null>(null);
   const [selectedLat, setSelectedLat] = useState<number | undefined>(undefined);
   const [selectedLon, setSelectedLon] = useState<number | undefined>(undefined);
+  const [lastUpdatedSydney, setLastUpdatedSydney] = useState<string>("--:--");
 
   const handleLocationChange = (lat: number, lon: number) => {
     setSelectedLat(lat);
@@ -107,6 +108,14 @@ export const Dashboard: React.FC = () => {
 
         const json = (await dashRes.json()) as DashboardData;
         setData(json);
+
+        const nowSydney = new Date().toLocaleTimeString("en-AU", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "Australia/Sydney"
+        });
+        setLastUpdatedSydney(nowSydney);
 
         if (forecastRes && forecastRes.ok) {
           const forecastJson = (await forecastRes.json()) as {
@@ -192,7 +201,7 @@ export const Dashboard: React.FC = () => {
               : (
                   <>
                     Last updated at{" "}
-                    <span className="font-medium">{data.time}</span>
+                    <span className="font-medium">{lastUpdatedSydney}</span>
                     {" • "}
                     <span className="text-slate-400">Auto-refreshes every 2 minutes</span>
                   </>

