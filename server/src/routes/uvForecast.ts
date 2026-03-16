@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { fetchOpenMeteoUvForecast } from "../clients/openMeteo";
+import { fetchArpansaUv } from "../clients/arpansa";
 
 export const uvForecastRouter = Router();
 
@@ -21,11 +22,36 @@ uvForecastRouter.get("/", async (req, res) => {
     const points = await fetchOpenMeteoUvForecast(lat, lon, safeHours);
     res.json({ points });
   } catch (err) {
-    console.error("[uv-forecast] Open-Meteo UV forecast failed:", err instanceof Error ? err.message : err);
-    res.status(502).json({
-      error: "uv forecast provider failed",
-      message: err instanceof Error ? err.message : String(err)
-    });
+    console.error(
+      "[uv-forecast] Open-Meteo UV forecast failed:",
+      err instanceof Error ? err.message : err
+    );
+
+    // Graceful fallback: try ARPANSA current UV and build a flat forecast curve.
+    try {
+      const { uvi } = await fetchArpansaUv(lat, lon);
+      const now = new Date();
+      const points = Array.from({ length: safeHours }, (_, i) => {
+        const t = new Date(now.getTime() + i * 60 * 60 * 1000);
+        return {
+          time: t.toISOString(),
+          uv: uvi
+        };
+      });
+      res.json({
+        points,
+        fallback: "arpansa-current"
+      });
+    } catch (fallbackErr) {
+      console.error(
+        "[uv-forecast] ARPANSA fallback failed:",
+        fallbackErr instanceof Error ? fallbackErr.message : fallbackErr
+      );
+      res.status(502).json({
+        error: "uv forecast provider failed",
+        message: err instanceof Error ? err.message : String(err)
+      });
+    }
   }
 });
 
