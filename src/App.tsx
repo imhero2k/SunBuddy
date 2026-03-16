@@ -22,6 +22,8 @@ const App: React.FC = () => {
   const [peakUv, setPeakUv] = useState<number | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [devPassword, setDevPassword] = useState("");
+  const [devError, setDevError] = useState<string | null>(null);
 
   // Track auth state
   useEffect(() => {
@@ -189,22 +191,57 @@ const App: React.FC = () => {
                   available only to authorised users.
                 </div>
               </div>
-              <button
-                type="button"
-                className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm shadow-soft"
-                onClick={async () => {
-                  try {
-                    const provider = new GoogleAuthProvider();
-                    await signInWithPopup(auth, provider);
-                  } catch (err) {
-                    // eslint-disable-next-line no-console
-                    console.error("Sign-in failed", err);
-                    alert("Sign-in failed. Please try again.");
-                  }
-                }}
-              >
-                Continue with Google
-              </button>
+              <div className="flex flex-col gap-3 items-stretch w-full max-w-xs">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-full bg-slate-900 text-white text-sm shadow-soft"
+                  onClick={async () => {
+                    try {
+                      const provider = new GoogleAuthProvider();
+                      await signInWithPopup(auth, provider);
+                    } catch (err) {
+                      // eslint-disable-next-line no-console
+                      console.error("Sign-in failed", err);
+                      alert("Sign-in failed. Please try again.");
+                    }
+                  }}
+                >
+                  Continue with Google
+                </button>
+                <form
+                  className="mt-2 space-y-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (devPassword === "TA11@123") {
+                      setUser({
+                        uid: "dev-bypass-user"
+                      } as User);
+                      setDevError(null);
+                    } else {
+                      setDevError("Invalid password");
+                    }
+                  }}
+                >
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={devPassword}
+                    onChange={(e) => setDevPassword(e.target.value)}
+                    className="w-full rounded-full border border-slate-300 px-3 py-1.5 text-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-1.5 rounded-full border border-dashed border-slate-300 text-xs text-slate-600"
+                  >
+                    Sign in with password
+                  </button>
+                  {devError && (
+                    <p className="text-[11px] text-red-500 text-center">
+                      {devError}
+                    </p>
+                  )}
+                </form>
+              </div>
             </div>
           )}
         </div>
